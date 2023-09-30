@@ -11,9 +11,9 @@ namespace TaskManagement.Domain.SeedWork
     {
         IUnitOfWork UnitOfWork { get; }
         Task<T> AddAsync(T entity);
-        Task GetByIdAsync(int id);
-        Task Get(Expression<Func<T, bool>> predicate);
-        Task<IReadOnlyList<T>> GetAll();
+        Task<T> GetByIdAsync(int id, params string[] includes);
+        Task<T> Get(Expression<Func<T, bool>> predicate, params string[] includes);
+        Task<IReadOnlyList<T>> GetAll(Expression<Func<T, bool>> predicate = null, params string[] includes);
         Task UpdateAsync(T entity);
     }
 }

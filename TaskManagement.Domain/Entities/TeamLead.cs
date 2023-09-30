@@ -24,6 +24,14 @@ namespace TaskManagement.Domain.Entities
         public string Password { get; private set; }
         public bool IsActive { get; private set; } = true;
         public DateTime DateCreated { get; private set; } = DateTime.Now;
-        public string Role { get; private set; } = nameof(TeamLead); 
+        public string Role { get; private set; } = nameof(TeamLead);
+
+        //navigational property
+        private readonly List<Project> projects = new();
+        public IReadOnlyCollection<Project> Projects => projects.AsReadOnly();
+
+        //navigational property for TeamMember because TeamLeads can have many TeamMembers
+        private readonly List<TeamMember> teamMembers = new();
+        public IReadOnlyCollection<TeamMember> TeamMembers => teamMembers.AsReadOnly();
     }
 }

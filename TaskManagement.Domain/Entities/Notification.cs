@@ -19,7 +19,7 @@ namespace TaskManagement.Domain.Entities
         }
         public int UserId { get; private set; }
 
-        public string Role { get; set; }
+        public string Role { get; private set; }
         public int Title { get; private set; }
         public int Description { get; private set; }      
         public DateTime DateCreated { get; private set; } = DateTime.Now;

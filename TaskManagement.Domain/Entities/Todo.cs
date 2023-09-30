@@ -19,7 +19,7 @@ namespace TaskManagement.Domain.Entities
         }
 
         public int ProjectTaskId { get; private set; }
-        public int TeamMemberId { get; set; }
+        public int TeamMemberId { get; private set; }
 
         public string Title { get; private set; }
         public string Description { get; private set; }

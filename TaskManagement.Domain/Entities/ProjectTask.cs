@@ -10,31 +10,31 @@ namespace TaskManagement.Domain.Entities
 
     public class ProjectTask:Entity
     {
-        public enum PRIORITY
-        {
-            High,
-            Medium,
-            Low
-        }
-        public ProjectTask(int projectId, int taskDescription, PRIORITY priority, string[] assignedTo, DateTime fromDate, DateTime toDate, bool isCompleted)
+        
+        public ProjectTask(int projectId, string taskDescription, string priority, string assignedTo, DateTime fromDate, DateTime toDate)
         {
             ProjectId = projectId;
             TaskDescription = taskDescription;
-            Priority = nameof(priority);
+            Priority = priority;
             AssignedTo = assignedTo;
             FromDate = fromDate;
             ToDate = toDate;
-            IsCompleted = isCompleted;
         }
 
         public int ProjectId { get; private set; }
-        public int TaskDescription { get; private set; }
+        public string TaskDescription { get; private set; }
         public string Priority { get; private set; }
-        public string[] AssignedTo { get; private set; }
+        public string AssignedTo { get; private set; } //assign to many team members
         public DateTime FromDate { get; private set; }
         public DateTime ToDate { get; private set; }
         public bool IsActive { get; private set; } = true;
-        public bool IsCompleted { get; private set; }
+        public bool IsCompleted { get; private set; } = false;
         public DateTime DateCreated { get; private set; } = DateTime.Now;
+
+        //child entity
+        public Project Project { get; private set; }
+        //navigational property
+        private readonly List<Todo> todo = new();
+        public IReadOnlyCollection<Todo> Todo => todo.AsReadOnly();
     }
 }
