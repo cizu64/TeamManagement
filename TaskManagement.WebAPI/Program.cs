@@ -19,6 +19,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddDataProtection();
+
+const string CorsPolicy = "CORS";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicy, policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowAnyOrigin();
+    });
+});
+
 var key = Encoding.ASCII.GetBytes("JWTKey");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -102,7 +114,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseCors(CorsPolicy);
 app.MapControllers();
 app.MapHealthChecks("/healths");
 app.Run();

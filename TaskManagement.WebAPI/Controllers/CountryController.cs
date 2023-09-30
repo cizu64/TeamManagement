@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TaskManagement.Domain.Entities;
@@ -19,18 +20,18 @@ namespace TaskManagement.WebAPI.Controllers
             this.protector = protector;
         }
         [HttpGet]
-        [Authorize(Policy = "TeamLeadOnly")]
+        //[Authorize(Policy = "TeamLeadOnly")]
         public async Task<IActionResult> GetCountries()
         {
             var countries = await _countryRepository.GetAll(c => c.IsActive);
             return Ok(countries);
         }
-        [HttpGet]
-        public async Task<IActionResult> Protector(string text)
-        {
-            var protect = protector.Protect(text);
-            var unprotect = protector.UnProtect(protect);
-            return Ok(new { protect, unprotect });
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Protector(string text)
+        //{
+        //    var protect = protector.Protect(text);
+        //    var unprotect = protector.UnProtect(protect);
+        //    return Ok(new { protect, unprotect });
+        //}
     }
 }
