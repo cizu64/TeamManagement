@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Domain.SeedWork;
 using TaskManagement.Infrastructure;
@@ -18,6 +20,26 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter(policyName: "fixed", options =>
+    {
+        options.PermitLimit = 2;
+        options.Window = TimeSpan.FromSeconds(30);
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 2;
+
+    });
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, _) =>
+    {
+        await context.HttpContext.Response.WriteAsync("too many request");
+    };
+});
+
+builder.Services.AddMemoryCache();
 builder.Services.AddDataProtection();
 
 const string CorsPolicy = "CORS";
@@ -31,20 +53,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-var key = Encoding.ASCII.GetBytes("JWTKey");
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new()
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(new byte[128]),
-        ValidateAudience = false,
-        ValidateIssuer = false,
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("TeamLeadOnly", policy =>
@@ -53,6 +61,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("TeamLead");
     });
 });
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -88,7 +97,10 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<TaskManagementContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration["ConnectionString"]);
+    options.UseSqlServer(builder.Configuration["ConnectionString"], options =>
+    {
+        options.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+    });
 });
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -106,7 +118,11 @@ app.UseAuthorization();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler(new ExceptionHandlerOptions()
+    {
+        AllowStatusCode404Response = true,
+        ExceptionHandlingPath = "/error"
+    });
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -114,6 +130,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseRateLimiter();
 app.UseCors(CorsPolicy);
 app.MapControllers();
 app.MapHealthChecks("/healths");

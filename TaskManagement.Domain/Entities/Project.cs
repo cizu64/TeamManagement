@@ -9,14 +9,15 @@ namespace TaskManagement.Domain.Entities
 {
     public class Project:Entity
     {
-        public Project(string name, int teamLeadId, string assignedTeamMemberIds)
+        public Project(string name, int teamLeadId, string description, string assignedTeamMemberIds)
         {
             Name = name;
             TeamLeadId = teamLeadId;
+            Description = description;
             AssignedTeamMemberIds = assignedTeamMemberIds;
         }
         public string Name { get; private set; }
-
+        public string Description { get; private set; }
         public int TeamLeadId { get; private set; }
         public bool IsActive { get; private set; } = true;
         public DateTime DateCreated { get; private set; } = DateTime.Now;

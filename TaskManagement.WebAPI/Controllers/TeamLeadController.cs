@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Domain.SeedWork;
 using TaskManagement.WebAPI.DTO;
@@ -29,6 +31,8 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDTO dto)
         {
             await _teamLeadRepo.AddAsync(new TeamLead(dto.CountryId,dto.Email, dto.Firstname, dto.Lastname, dto.Password));
+            var checkEmailExists = await _teamLeadRepo.AnyAsync(e => e.Email == dto.Email);
+            if(checkEmailExists) return Problem(detail: "Email already exists", statusCode: (int)HttpStatusCode.InternalServerError);
             await _teamLeadRepo.UnitOfWork.SaveAsync();
             //return created object 
             return Ok("Account created");
@@ -37,19 +41,17 @@ namespace TaskManagement.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn([FromBody] SignInDTO dto)
         {
-         
             string token = await auth.AuthenticateTeamLead(dto.Email, dto.Password);
-            ArgumentNullException.ThrowIfNull(token); 
-            
+            if (token == string.Empty) return Problem(detail: "Invalid email or password", statusCode: (int)HttpStatusCode.InternalServerError);
             //return jwt token  
             return Ok(token);
         }
 
         //create project
-        [HttpPost]
+        [HttpPost, Authorize(Policy = "TeamLead")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO dto)
         {
-            await _projectRepo.AddAsync(new Project(dto.Name, dto.TeamLeadId, dto.AssignedTeamMemberIds));
+            await _projectRepo.AddAsync(new Project(dto.Name, dto.TeamLeadId,dto.Description, dto.AssignedTeamMemberIds));
             await _projectRepo.UnitOfWork.SaveAsync();
             return Ok($"""Project "{dto.Name}" created successfully"""); //using the new c# raw string literal 
         }
@@ -138,5 +140,7 @@ namespace TaskManagement.WebAPI.Controllers
 
             return BadRequest("Team member does not exists. You can create this user as a team member and add to the project");
         }
+
+        //define assign team member to project task action method
     }
 }

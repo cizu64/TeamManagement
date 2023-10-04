@@ -24,7 +24,11 @@ namespace TaskManagement.Infrastructure.Repository
             await _set.AddAsync(entity);
             return entity;
         }
-
+        public async Task<bool> AnyAsync(Expression<Func<T,bool>> entity)
+        {
+            var any = await _set.AnyAsync(entity);
+            return any;
+        }
         public async Task<T> Get(Expression<Func<T, bool>> predicate, params string[] includes)
         {
             var data = await _set.FirstOrDefaultAsync(predicate);
