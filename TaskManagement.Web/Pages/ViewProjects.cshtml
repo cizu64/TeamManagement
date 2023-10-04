@@ -37,7 +37,6 @@
                                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                                          aria-labelledby="dropdownMenuLink">
                                         <div class="dropdown-header">Dropdown Header:</div>
-                                        <a class="dropdown-item" href="#">View Project</a>
                                         <a class="dropdown-item" href="#">View Task</a>
                                     </div>
                                 </div>
@@ -45,36 +44,12 @@
                             <!-- Card Body -->
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <form class="user" method="post">
-                                        @Html.AntiForgeryToken()
-                                        <div class="form-group row">
-                                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                                <input type="text" class="form-control form-control-user" id="exampleFirstName"
-                                                       placeholder="First Name" name="RegisterDTO.Firstname">
-                                                <span asp-validation-for="ProjectDTO.Name" class="text-white badge badge-danger"></span>
 
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control form-control-user" id="exampleLastName"
-                                                       placeholder="Last Name" name="RegisterDTO.Lastname">
-                                                <span asp-validation-for="ProjectDTO.Description" class="text-white badge badge-danger"></span>
-                                            </div>
-                                        </div>
-                                       
-                                        <input type="submit" value="Create Project" class="btn btn-primary btn-user btn-block" />
-
-                                        <div class="mt-2">
-                                            @if (ViewData["err"] != null)
-                                            {
-                                                <span class="text-white badge badge-danger">@ViewData["err"]</span>
-                                            }
-                                            else if(ViewData["suc"]!=null)
-                                            {
-                                                <span class="text-white badge badge-danger">@ViewData["suc"]</span>
-                                            }
-                                        </div>
-                                    </form>
-
+                                    <!--Table-->
+                                    @foreach(var project in Model.Projects)
+                                    {
+                                      
+                                    }
                                 </div>
                             </div>
                         </div>

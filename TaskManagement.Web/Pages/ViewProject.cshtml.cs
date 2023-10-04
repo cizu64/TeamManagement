@@ -6,6 +6,7 @@ using System.Net;
 using TaskManagement.Web.Attributes;
 using TaskManagement.Web.Common;
 using TaskManagement.Web.Services;
+using TaskManagement.Web.VM;
 
 namespace TaskManagement.Web.Pages
 {
@@ -23,26 +24,19 @@ namespace TaskManagement.Web.Pages
         public async Task<IActionResult> OnGet(int projectId)
         {  
             string token = Request.Cookies["token"].ToString();
-            APIResult project = await teamLead.ViewProject(token, ProjectId);
+            APIResult project = await teamLead.ViewProject(token, projectId);
             if (project.statusCode != (int)HttpStatusCode.OK)
             {
                 ViewData["err"] = project.detail; //display the detail of the error
                 return Page();
             }
-            ViewData["project"] = project.detail;
+            ViewProject = (ViewProject) project.detail;
             return Page();
         }
 
         [BindProperty]
-        public ViewProjectModel ViewProjectModel { get; set; }
+        public ViewProject ViewProject { get; set; }
 
     }
 
-    public class ViewProjectModel
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string[] assignedTeamMemberIds { get; set; }
-        public DateTime DateCreated { get; set; }
-    }
 }

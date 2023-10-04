@@ -27,7 +27,7 @@ namespace TaskManagement.Web.Services
                 var token = await request.Content.ReadFromJsonAsync<string>();
                 return new APIResult
                 {
-                    detail= (string)token,
+                    detail= token,
                     statusCode = (int)request.StatusCode
                 };
             }
@@ -52,7 +52,7 @@ namespace TaskManagement.Web.Services
                 var token = await request.Content.ReadAsStringAsync();
                 return new APIResult
                 {
-                    detail = (string)token,
+                    detail = token,
                     statusCode = (int)request.StatusCode
                 };
             }
@@ -81,7 +81,7 @@ namespace TaskManagement.Web.Services
                 var message = await request.Content.ReadAsStringAsync();
                 return new APIResult
                 {
-                    detail = (string)message,
+                    detail = message,
                     statusCode = (int)request.StatusCode
                 };
             }
@@ -103,7 +103,7 @@ namespace TaskManagement.Web.Services
                 var project = await request.Content.ReadFromJsonAsync<ViewProject>();
                 return new APIResult
                 {
-                    detail = (ViewProject)project,
+                    detail = project,
                     statusCode = (int)request.StatusCode
                 };
             }
@@ -125,7 +125,7 @@ namespace TaskManagement.Web.Services
                 var project = await request.Content.ReadFromJsonAsync<IList<Projects>>();
                 return new APIResult
                 {
-                    detail = (IList<Projects>)project,
+                    detail = project,
                     statusCode = (int)request.StatusCode
                 };
             }

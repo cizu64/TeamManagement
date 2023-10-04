@@ -29,20 +29,14 @@ namespace TaskManagement.Web.Pages
                 ViewData["err"] = project.detail; //display the detail of the error
                 return Page();
             }
-            ViewData["projects"] = (IList<Projects>)project.detail;
+            Projects = (IList<Projects>)project.detail;
             return Page();
         }
 
         [BindProperty]
-        public ViewProjectModel ViewProjectModel { get; set; }
+        public IList<Projects> Projects{ get; set; }
 
     }
 
-    public class ViewProjectModel
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string[] assignedTeamMemberIds { get; set; }
-        public DateTime DateCreated { get; set; }
-    }
+  
 }
