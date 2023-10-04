@@ -6,51 +6,43 @@ using System.Net;
 using TaskManagement.Web.Attributes;
 using TaskManagement.Web.Common;
 using TaskManagement.Web.Services;
+using TaskManagement.Web.VM;
 
 namespace TaskManagement.Web.Pages
 {
     [TokenAuthorize(Role: "TeamLead")]
-    public class CreateProjectModel : PageModel
+    public class ViewProjectsModel : PageModel
     {
         private readonly TeamLead teamLead;
 
-        public CreateProjectModel(TeamLead teamLead)
+        public ViewProjectsModel(TeamLead teamLead)
         {
             this.teamLead = teamLead;
         }
 
-
         public async Task<IActionResult> OnGet()
-        {
-            return Page();
-        }
-
-        [BindProperty]
-        public ProjectDTO ProjectDTO { get; set; }
-        public async Task<IActionResult> OnPost()
-        {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+        {  
             string token = Request.Cookies["token"].ToString();
-            APIResult project = await teamLead.AddProject(token, ProjectDTO.Name, ProjectDTO.Description, ProjectDTO.assignedTeamMemberIds);
+            APIResult project = await teamLead.ViewProjects(token);
             if (project.statusCode != (int)HttpStatusCode.OK)
             {
                 ViewData["err"] = project.detail; //display the detail of the error
                 return Page();
             }
-            ViewData["suc"] = project.detail;
+            ViewData["projects"] = (IList<Projects>)project.detail;
             return Page();
         }
+
+        [BindProperty]
+        public ViewProjectModel ViewProjectModel { get; set; }
+
     }
 
-    public class ProjectDTO
+    public class ViewProjectModel
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
         public string Description { get; set; }
         public string[] assignedTeamMemberIds { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

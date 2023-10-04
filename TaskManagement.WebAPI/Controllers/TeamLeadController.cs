@@ -51,19 +51,31 @@ namespace TaskManagement.WebAPI.Controllers
         [HttpPost, Authorize(Policy = "TeamLead")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO dto)
         {
-            await _projectRepo.AddAsync(new Project(dto.Name, dto.TeamLeadId,dto.Description, dto.AssignedTeamMemberIds));
+            int teamLeadId = 0;
+            int.TryParse(User.Identity.Name, out int teamLeadId);
+            await _projectRepo.AddAsync(new Project(dto.Name,teamLeadId, dto.Description, dto.AssignedTeamMemberIds));
             await _projectRepo.UnitOfWork.SaveAsync();
             return Ok($"""Project "{dto.Name}" created successfully"""); //using the new c# raw string literal 
         }
 
         //view project
-        [HttpGet("{Id:int}")]
+        [HttpGet("{Id:int}"), Authorize(Policy="TeamLead")]
         public async Task<IActionResult> ViewProject(int Id)
         {
-            int teamLeadId = 0; //should come from the current logged in user
+            int teamLeadId = 0;
+            int.TryParse(User.Identity.Name,out int teamLeadId);
             var project = await _projectRepo.Get(p => p.Id == Id && p.TeamLeadId == teamLeadId);
-            ArgumentNullException.ThrowIfNull(project); //guard clauses
             return Ok(project);
+        }
+
+        //view projects
+        [HttpGet, Authorize(Policy = "TeamLead")]
+        public async Task<IActionResult> ViewProjects()
+        {
+            int teamLeadId = 0;
+            int.TryParse(User.Identity.Name, out int teamLeadId);
+            var projects = await _projectRepo.GetAll(p => p.TeamLeadId == teamLeadId);
+            return Ok(projects);
         }
 
         //create project task

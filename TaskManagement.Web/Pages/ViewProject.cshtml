@@ -1,7 +1,7 @@
-﻿@page
-@model CreateProjectModel
+﻿@page "{projectId:int}"
+@model ViewProjectModel
 @{
-    ViewData["Title"] = "Create Project";
+    ViewData["Title"] = "View Project";
 }
 
 <!-- Page Wrapper -->
@@ -37,43 +37,26 @@
                                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                                          aria-labelledby="dropdownMenuLink">
                                         <div class="dropdown-header">Dropdown Header:</div>
-                                        <a class="dropdown-item" href="#">View Projects</a>
-                                        <a class="dropdown-item" href="#">View Tasks</a>
+                                        <a class="dropdown-item" href="#">View Task Assigned</a>
+                                        <a class="dropdown-item" href="#">Remove Project</a>
                                     </div>
                                 </div>
                             </div>
                             <!-- Card Body -->
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <form class="user" method="post">
-                                        @Html.AntiForgeryToken()
-                                        <div class="form-group row">
-                                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                                <input type="text" class="form-control form-control-user" id="exampleFirstName"
-                                                       placeholder="First Name" name="RegisterDTO.Firstname">
-                                                <span asp-validation-for="ProjectDTO.Name" class="text-white badge badge-danger"></span>
 
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control form-control-user" id="exampleLastName"
-                                                       placeholder="Last Name" name="RegisterDTO.Lastname">
-                                                <span asp-validation-for="ProjectDTO.Description" class="text-white badge badge-danger"></span>
-                                            </div>
-                                        </div>
-                                       
-                                        <input type="submit" value="Create Project" class="btn btn-primary btn-user btn-block" />
+                                    <p class="strong">
+                                        @Model.Name
+                                    </p>
 
-                                        <div class="mt-2">
-                                            @if (ViewData["err"] != null)
-                                            {
-                                                <span class="text-white badge badge-danger">@ViewData["err"]</span>
-                                            }
-                                            else if(ViewData["suc"]!=null)
-                                            {
-                                                <span class="text-white badge badge-danger">@ViewData["suc"]</span>
-                                            }
-                                        </div>
-                                    </form>
+                                    <p>
+                                        @ModelDescription.
+                                    </p>
+
+                                    <p>
+                                        @Model.DateCreated;
+                                    </p>
 
                                 </div>
                             </div>

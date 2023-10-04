@@ -2,6 +2,7 @@
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
+using TaskManagement.Web.VM;
 using TaskManagement.Web.Common;
 using TaskManagement.Web.Extensions;
 namespace TaskManagement.Web.Services
@@ -26,7 +27,7 @@ namespace TaskManagement.Web.Services
                 var token = await request.Content.ReadFromJsonAsync<string>();
                 return new APIResult
                 {
-                    detail= token,
+                    detail= (string)token,
                     statusCode = (int)request.StatusCode
                 };
             }
@@ -51,7 +52,7 @@ namespace TaskManagement.Web.Services
                 var token = await request.Content.ReadAsStringAsync();
                 return new APIResult
                 {
-                    detail = token,
+                    detail = (string)token,
                     statusCode = (int)request.StatusCode
                 };
             }
@@ -60,14 +61,13 @@ namespace TaskManagement.Web.Services
             return result;
         }
 
-        public async Task<APIResult> AddProject(string token,string name, string description, int teamLeadId,string[] assignedTeamMemberIds)
+        public async Task<APIResult> AddProject(string token,string name, string description,string[] assignedTeamMemberIds)
         {
             
             var data = new
             {
                 name,
                 description,
-                teamLeadId,
                 assignedTeamMemberIds,
             };
             var headers = new Dictionary<string, string>
@@ -81,7 +81,51 @@ namespace TaskManagement.Web.Services
                 var message = await request.Content.ReadAsStringAsync();
                 return new APIResult
                 {
-                    detail = message,
+                    detail = (string)message,
+                    statusCode = (int)request.StatusCode
+                };
+            }
+            var errorDetails = await request.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            return result;
+        }
+
+        public async Task<APIResult> ViewProject(string token, int projectId)
+        {
+            var headers = new Dictionary<string, string>
+            {
+                { "Authorization", token }
+            };
+
+            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProject/{projectId}", "TeamLead", null , headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            if (request.IsSuccessStatusCode)
+            {
+                var project = await request.Content.ReadFromJsonAsync<ViewProject>();
+                return new APIResult
+                {
+                    detail = (ViewProject)project,
+                    statusCode = (int)request.StatusCode
+                };
+            }
+            var errorDetails = await request.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            return result;
+        }
+
+        public async Task<APIResult> ViewProjects(string token)
+        {
+            var headers = new Dictionary<string, string>
+            {
+                { "Authorization", token }
+            };
+
+            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProjects", "TeamLead", null, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            if (request.IsSuccessStatusCode)
+            {
+                var project = await request.Content.ReadFromJsonAsync<IList<Projects>>();
+                return new APIResult
+                {
+                    detail = (IList<Projects>)project,
                     statusCode = (int)request.StatusCode
                 };
             }
