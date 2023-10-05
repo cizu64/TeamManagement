@@ -79,10 +79,12 @@ namespace TaskManagement.WebAPI.Controllers
         }
 
         //create project task
-        [HttpPost]
+        [HttpPost, Authorize(Policy = "TeamLead")]
         public async Task<IActionResult> CreateProjectTask([FromBody] CreateProjectTaskDTO dto)
         {
-            await _projectTaskRepo.AddAsync(new ProjectTask(dto.ProjectId,dto.TaskDescription,nameof(dto.Priority).ToString(),dto.AssignedTo,dto.FromDate,dto.ToDate));
+            int teamLeadId = 0;
+            int.TryParse(User.Identity.Name, out int teamLeadId);            
+            await _projectTaskRepo.AddAsync(new ProjectTask(teamLeadId,dto.ProjectId,dto.Title,dto.TaskDescription,nameof(dto.Priority).ToString(),dto.AssignedTo,dto.FromDate,dto.ToDate));
             await _projectTaskRepo.UnitOfWork.SaveAsync();
             return Ok($"Project task created successfully");
         }

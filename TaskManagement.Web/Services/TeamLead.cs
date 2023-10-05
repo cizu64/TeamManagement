@@ -133,5 +133,37 @@ namespace TaskManagement.Web.Services
             var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
             return result;
         }
+
+        public async Task<APIResult> AddTask(string token,int projectId, string[] assignedTo, string title, string description, string priority, DateTime from, DateTime to)
+        {
+            var data = new
+            {
+                from,
+                assignedTo,
+                to,
+                priority,
+                projectId,
+                title,
+                description
+            };
+            var headers = new Dictionary<string, string>
+            {
+                { "Authorization", token }
+            };
+
+            var request = await _client.SendRequestAsync(HttpMethod.Post, "/CreateProjectTask", "TeamLead", data, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            if (request.IsSuccessStatusCode)
+            {
+                var message = await request.Content.ReadAsStringAsync();
+                return new APIResult
+                {
+                    detail = message,
+                    statusCode = (int)request.StatusCode
+                };
+            }
+            var errorDetails = await request.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            return result;
+        }
     }
 }

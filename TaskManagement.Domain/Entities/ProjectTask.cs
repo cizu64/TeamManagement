@@ -11,17 +11,20 @@ namespace TaskManagement.Domain.Entities
     public class ProjectTask:Entity
     {
         
-        public ProjectTask(int projectId, string taskDescription, string priority, string assignedTo, DateTime fromDate, DateTime toDate)
+        public ProjectTask(int teamLeadId,int projectId, string title,string taskDescription, string priority, string assignedTo, DateTime fromDate, DateTime toDate)
         {
+            TeamLeadId = teamLeadId;
             ProjectId = projectId;
+            Title = title;
             TaskDescription = taskDescription;
             Priority = priority;
             AssignedTo = assignedTo;
             FromDate = fromDate;
             ToDate = toDate;
         }
-
+        public int TeamLeadId { get; private set; }
         public int ProjectId { get; private set; }
+        public string Title { get; private set; }
         public string TaskDescription { get; private set; }
         public string Priority { get; private set; }
         public string AssignedTo { get; private set; } //assign to many team members
