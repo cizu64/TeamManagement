@@ -61,8 +61,13 @@
                                             </div>
 
                                             <div class="col-sm-6 mt-3">
-                                                <select class="form-control" name="ProjectDTO.assignedTeamMemberIds" multiple>
-                                                  
+                                           
+                                          <select name="ProjectDTO.assignedTeamMemberIds" class="form-control select" multiple>
+
+                                                    @foreach (var tm in (TeamMembers[])ViewData["tm"])
+                                                    {
+                                                        <option value="@tm.Id">@tm.Firstname +"-"+ tm.Lastname</option>
+                                                    }
                                                 </select>
                                                 <span asp-validation-for="ProjectDTO.assignedTeamMemberIds" class="text-white badge badge-danger"></span>
                                             </div>

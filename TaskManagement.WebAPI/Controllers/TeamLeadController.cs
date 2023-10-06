@@ -74,7 +74,21 @@ namespace TaskManagement.WebAPI.Controllers
             int teamLeadId = 0;
             if(!int.TryParse(User.Identity.Name,out teamLeadId)) return Problem(detail: "Anthorization required", statusCode: (int)HttpStatusCode.InternalServerError);
             var project = await _projectRepo.Get(p => p.Id == Id && p.TeamLeadId == teamLeadId);
-            return Ok(project);
+            var teamMembers = project.AssignedTeamMemberIds.Split("_");
+            string Members = "";
+            foreach (var id in teamMembers)
+            {
+                var tm = await _teamMemberRepo.Get(t => t.Id == id);
+                Members += $"{tm.Firstname} {tm.Lastname} -> ";
+
+            }
+            return Ok(new
+            {
+                project.Name,
+                project.Description,
+                project.DateCreated,
+                AssignedTeamMemberIds = Members
+            });
         }
 
         //view projects
@@ -83,8 +97,24 @@ namespace TaskManagement.WebAPI.Controllers
         {
             int teamLeadId = 0;
             int.TryParse(User.Identity.Name, out teamLeadId);
+
             var projects = await _projectRepo.GetAll(p => p.TeamLeadId == teamLeadId);
-            return Ok(projects);
+
+            var teamMembers = projects.Select(t => t.AssignedTeamMemberIds).Split("_");
+            string Members = "";
+            foreach (var id in teamMembers)
+            {
+                var tm = await _teamMemberRepo.Get(t => t.Id == id);
+                Members += $"{tm.Firstname} {tm.Lastname} -> ";
+
+            }
+            return Ok(projects.Select(p => new
+            {
+                p.Name,
+                p.Description,
+                p.DateCreated,
+                AssignedTeamMemberIds = Members
+            }));
         }
 
         //create project task
@@ -112,8 +142,17 @@ namespace TaskManagement.WebAPI.Controllers
             int teamLeadId = 0; //should come from the current logged in user
             int.TryParse(User.Identity.Name, out teamLeadId);
             var projectTask = await _projectTaskRepo.GetAll(t => t.TeamLeadId == teamLeadId, "Project");
+            var teamMembers = projectTask.Select(t => t.AssignedTo).Split("_");
+            string Members = "";
+            foreach (var id in teamMembers)
+            {
+                var tm = await _teamMemberRepo.Get(t => t.Id == id);
+                Members += $"{tm.Firstname} {tm.Lastname} -> ";
+
+            }
             return Ok(projectTask.Select(t => new
             {
+                t.Id,
                 t.Project.Name,
                 t.Title,
                 t.TaskDescription,
@@ -122,7 +161,7 @@ namespace TaskManagement.WebAPI.Controllers
                 StartDate = t.FromDate,
                 EndDate = t.ToDate,
                 t.IsCompleted,
-                t.AssignedTo,
+                AssignedTo = Members,
                 t.DateCreated
             }));
         }
@@ -137,15 +176,15 @@ namespace TaskManagement.WebAPI.Controllers
             await _projectTaskRepo.UnitOfWork.SaveAsync();
             return Ok($"Team member created successfully");
         }
-        ////view team members
-        //[HttpGet, Authorize(Policy = "TeamLeadOnly")]
-        //public async Task<IActionResult> ViewTeamMembers()
-        //{
-        //    int teamLeadId = 0; //should come from the current logged in user
-        //    var teamMembers = await _teamMemberRepo.GetAll(t => t.TeamLeadId == teamLeadId);
-        //    ArgumentNullException.ThrowIfNull(teamMembers); //guard clauses
-        //    return Ok(teamMembers);
-        //}
+        //view team members
+        [HttpGet, Authorize(Policy = "TeamLeadOnly")]
+        public async Task<IActionResult> ViewTeamMembers()
+        {
+            int teamLeadId = 0; //should come from the current logged in user
+            var teamMembers = await _teamMemberRepo.GetAll(t => t.TeamLeadId == teamLeadId);
+            if (teamMembers == null) return Problem(detail: "No user found", statusCode: (int)HttpStatusCode.InternalServerError);
+            return Ok(teamMembers);
+        }
 
         ////view team member
         //[HttpGet("{Id:int}")]
@@ -158,32 +197,28 @@ namespace TaskManagement.WebAPI.Controllers
         //}
 
         //assign team members to project
-        [HttpPut("{ProjectId:int}")]
-        public async Task<IActionResult> AssignTeamMembersToProject(int ProjectId, [FromBody]int teamMemberId)
+        [HttpPut("{ProjectId:int}"), Authorize(Policy = "TeamLeadOnly")]
+        public async Task<IActionResult> AssignTeamMembersToProject(int ProjectId, [FromBody] int teamMemberId)
         {
-            int teamLeadId = 0; //should come from the current logged in user
+            int teamLeadId;
+            int.TryParse(User.Identity.Name, out teamLeadId);
             var project = await _projectRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == ProjectId);
-
-            ArgumentNullException.ThrowIfNull(project); //guard clauses
-           
             //check if the team member was created by the team lead
-            var teamMember = await _teamMemberRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id==teamMemberId);
-            if (teamMember != null) 
+            var teamMember = await _teamMemberRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == teamMemberId);
+            if (teamMember == null) return Problem(detail: "Team member does not exists. You can create this user as a team member and add to the project", statusCode: (int)HttpStatusCode.InternalServerError);
+            //check if team member is already assigned to project
+            if (project.AssignedTeamMemberIds.Split("_").Any(id => id == teamMemberId.ToString()))
             {
-                //check if team member is already assigned to project
-                if (project.AssignedTeamMemberIds.Split("_").Any(id => id == teamMemberId.ToString()))
-                {
-                    //team member already assigned to project
-                    return Ok($"Team member ({teamMember.Firstname}) already assigned to project");
-                }
-                project.AssignTeamMember(teamMemberId); //domain entity behavior
-
-                //save changes to database by caling the UnitOfWork
-                await _projectRepo.UnitOfWork.SaveAsync();
-                return Ok($"Team member ({teamMember.Firstname}) is not assigned to the project ({project.Name})");
+                //team member already assigned to project
+                return Ok($"Team member ({teamMember.Firstname}) already assigned to project");
             }
+            project.AssignTeamMember(teamMemberId); //domain entity behavior
 
-            return BadRequest("Team member does not exists. You can create this user as a team member and add to the project");
+            //save changes to database by caling the UnitOfWork
+            await _projectRepo.UnitOfWork.SaveAsync();
+            return Ok($"Team member ({teamMember.Firstname}) is now assigned to the project ({project.Name})");
+
+
         }
 
         //define assign team member to project task action method

@@ -6,57 +6,63 @@ using System.Net;
 using TaskManagement.Web.Attributes;
 using TaskManagement.Web.Common;
 using TaskManagement.Web.Services;
+using TaskManagement.Web.VM;
 
 namespace TaskManagement.Web.Pages
 {
     [TokenAuthorize(Role: "TeamLead")]
-    public class CreateProjectModel : PageModel
+    public class AssignProjectModel : PageModel
     {
         private readonly TeamLead teamLead;
 
-        public CreateProjectModel(TeamLead teamLead)
+        public AssignProjectModel(TeamLead teamLead)
         {
             this.teamLead = teamLead;
         }
-
 
         public async Task<IActionResult> OnGet()
         {
             string token = Request.Cookies["token"].ToString();
             var teamMembers = await teamLead.ViewTeamMembers(token);
             ViewData["tm"] = teamMembers.detail as VM.TeamMembers[];
+
+            APIResult projects = await teamLead.ViewProjects(token);
+            ViewData["projects"] = projects.detail as IReadOnlyList<AllProject>;
             return Page();
         }
 
         [BindProperty]
-        public ProjectDTO ProjectDTO { get; set; }
+        public AssignProjectDTO AssignProjectDTO { get; set; }
         public async Task<IActionResult> OnPost()
         {
             string token = Request.Cookies["token"].ToString();
             var teamMembers = await teamLead.ViewTeamMembers(token);
             ViewData["tm"] = teamMembers.detail as VM.TeamMembers[];
+
+            APIResult projects = await teamLead.ViewProjects(token);
+            ViewData["projects"] = projects.detail as IReadOnlyList<AllProject>;
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
-            APIResult project = await teamLead.AddProject(token, ProjectDTO.Name, ProjectDTO.Description, ProjectDTO.assignedTeamMemberIds);
-            if (project.statusCode != (int)HttpStatusCode.OK)
+            APIResult teamMember = await teamLead.AssignProject(token, AssignProjectDTO.projectId, AssignProjectDTO.teamMemberId);
+            if (teamMember.statusCode != (int)HttpStatusCode.OK)
             {
-                ViewData["err"] = project.detail; //display the detail of the error
+                ViewData["err"] = teamMember.detail; //display the detail of the error
                 return Page();
             }
-            ViewData["suc"] = project.detail;
+            ViewData["suc"] = teamMember.detail;
             return Page();
         }
     }
 
-    public class ProjectDTO
+    public record AssignProjectDTO
     {
-        [Required(ErrorMessage = "The Project Name is Required")]
-        public string Name { get; set; }
-        [Required(ErrorMessage ="The Project Description is Required")]
-        public string Description { get; set; }
-        
-        public string[]? assignedTeamMemberIds { get; set; }
+        [Required]
+        public required int teamMemberId { get; set; }
+        [Required]
+        public required int projectId { get; set; }
+       
     }
 }

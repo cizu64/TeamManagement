@@ -25,6 +25,9 @@ namespace TaskManagement.Web.Pages
             string token = Request.Cookies["token"].ToString();
             APIResult projects = await teamLead.ViewProjects(token);
             ViewData["projects"] = projects.detail as IReadOnlyList<AllProject>;
+
+            var teamMembers = await teamLead.ViewTeamMembers(token);
+            ViewData["tm"] = teamMembers.detail as VM.TeamMembers[];
             return Page();
         }
 
@@ -35,6 +38,9 @@ namespace TaskManagement.Web.Pages
             string token = Request.Cookies["token"].ToString();
             APIResult projects = await teamLead.ViewProjects(token);
             ViewData["projects"] = projects.detail as IReadOnlyList<AllProject>;
+
+            var teamMembers = await teamLead.ViewTeamMembers(token);
+            ViewData["tm"] = teamMembers.detail as VM.TeamMembers[];
 
             if (!ModelState.IsValid)
             {

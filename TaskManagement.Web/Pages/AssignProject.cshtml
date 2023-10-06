@@ -1,25 +1,25 @@
 ﻿@page
-@model CreateProjectTaskModel
-@{
-    ViewData["Title"] = "Create Project Task";
-}
 @using TaskManagement.Web.VM;
+@model AssignProjectModel
+@{
+    ViewData["Title"] = "Create Project";
+}
 
 <!-- Page Wrapper -->
 <div id="wrapper">
 
-    <partial name="_Sidebar" />
+   <partial name="_Sidebar"/>
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
 
         <!-- Main Content -->
         <div id="content">
 
-            <partial name="_Topbar" />
+        <partial name="_Topbar"/>
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
-
+                
                 <!-- Content Row -->
 
                 <div class="row">
@@ -29,7 +29,7 @@
                         <div class="card shadow mb-4">
                             <!-- Card Header - Dropdown -->
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Create Project Task!</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Assign to Project</h6>
                                 <div class="dropdown no-arrow">
                                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -51,7 +51,7 @@
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
 
-                                                <select name="ProjectTaskDTO.ProjectId" class="form-control select">
+                                                <select name="AssignProjectDTO.proectId" class="form-control select">
 
                                                     @foreach (var project in (IReadOnlyList<AllProject>)ViewData["projects"])
                                                     {
@@ -59,83 +59,42 @@
 
                                                     }
 
-
                                                 </select>
-
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control"
-                                                       placeholder="Title" name="ProjectTaskDTO.Title">
-                                                <span asp-validation-for="ProjectTaskDTO.Title" class="text-white badge badge-danger"></span>
                                             </div>
 
-
-
-                                            <div class="col-sm-6 mt-3">
-                                                <select class="form-control select"
-                                                        placeholder="Priority" name="ProjectTaskDTO.Priority">
-                                                    <option value="HIGH" selected>HIGH</option>
-                                                    <option value="MEDIUM">MEDIUM</option>
-                                                    <option value="LOW">LOW</option>
-                                                </select>
-                                                <span asp-validation-for="ProjectTaskDTO.Priority" class="text-white badge badge-danger"></span>
-                                            </div>
-
-                                            <div class="col-sm-6 mt-3">
-                                                <textarea class="form-control"
-                                                          placeholder="Description" name="ProjectTaskDTO.TaskDescription"></textarea>
-                                                <span asp-validation-for="ProjectTaskDTO.TaskDescription" class="text-white badge badge-danger"></span>
-                                            </div>
-
-
-                                            <div class="col-sm-6 mt-3">
-                                                Start Date:
-                                                <input type="date" class="form-control"
-                                                       placeholder="Start Date" name="ProjectTaskDTO.FromDate">
-                                                <span asp-validation-for="ProjectTaskDTO.FromDate" class="text-white badge badge-danger"></span>
-                                            </div>
-
-                                            <div class="col-sm-6 mt-3">
-                                                End Date:
-                                                <input type="date" class="form-control"
-                                                       placeholder="End Date" name="ProjectTaskDTO.ToDate">
-                                                <span asp-validation-for="ProjectTaskDTO.ToDate" class="text-white badge badge-danger"></span>
-                                            </div>                                           
-
-                                            <div class="col-sm-6 mt-3">
-
-                                                <select name="ProjectTaskDTO.AssignedTeamMemberIds" class="form-control select" multiple>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <select name="AssignProjectDTO.teamMemberId" class="form-control select">
 
                                                     @foreach (var tm in (TeamMembers[])ViewData["tm"])
                                                     {
                                                         <option value="@tm.Id">@tm.Firstname +"-"+ tm.Lastname</option>
                                                     }
                                                 </select>
-                                                <span asp-validation-for="ProjectTaskDTO.AssignedTeamMemberIds" class="text-white badge badge-danger"></span>
                                             </div>
 
+
                                         </div>
 
-                                        <input type="submit" value="Create Project Task" class="btn btn-primary btn-user btn-block" />
+                                            <input type="submit" value="Assign" class="btn btn-primary btn-user btn-block" />
 
-                                        <div class="mt-2">
-                                            @if (ViewData["err"] != null)
-                                            {
-                                                <span class="text-white badge badge-danger">@ViewData["err"]</span>
-                                            }
-                                            else if (ViewData["suc"] != null)
-                                            {
-                                                <span class="text-white badge badge-success">@ViewData["suc"]</span>
-                                            }
-                                        </div>
-                                    </form>
+                                            <div class="mt-2">
+                                                @if (ViewData["err"] != null)
+                                                {
+                                                    <span class="text-white badge badge-danger">@ViewData["err"]</span>
+                                                }
+                                                else if (ViewData["suc"] != null)
+                                                {
+                                                    <span class="text-white badge badge-success">@ViewData["suc"]</span>
+                                                }
+                                            </div>
+</form>
 
                                 </div>
                             </div>
                         </div>
                     </div>
 
-
+                
                 </div>
 
             </div>
