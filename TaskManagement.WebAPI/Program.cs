@@ -1,27 +1,40 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Threading.RateLimiting;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Domain.SeedWork;
 using TaskManagement.Infrastructure;
 using TaskManagement.Infrastructure.Repository;
 using TaskManagement.WebAPI.BackgroundServices;
+using TaskManagement.WebAPI.Filter;
 using TaskManagement.WebAPI.Filters;
 using TaskManagement.WebAPI.Security;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-
-
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+            new BadRequestObjectResult(new
+            {
+                Detail = context.ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage,
+                StatusCode = (int)HttpStatusCode.BadRequest
+            });
+    });
 builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter(policyName: "fixed", options =>
@@ -52,6 +65,19 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin();
     });
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(new byte[128]),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 
 builder.Services.AddAuthorization(options =>
 {
@@ -123,6 +149,7 @@ if (app.Environment.IsDevelopment())
         AllowStatusCode404Response = true,
         ExceptionHandlingPath = "/error"
     });
+    
     app.UseSwagger();
     app.UseSwaggerUI();
 }

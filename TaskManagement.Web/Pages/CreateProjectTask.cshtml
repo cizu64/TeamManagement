@@ -1,9 +1,8 @@
 ﻿@page
 @model CreateProjectTaskModel
 @{
-    ViewData["Title"] = "Create Project";
+    ViewData["Title"] = "Create Project Task";
 }
-@using System.Collections.Generics;
 @using TaskManagement.Web.VM;
 
 <!-- Page Wrapper -->
@@ -30,7 +29,7 @@
                         <div class="card shadow mb-4">
                             <!-- Card Header - Dropdown -->
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Create a new Project!</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Create Project Task!</h6>
                                 <div class="dropdown no-arrow">
                                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -52,47 +51,66 @@
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
 
-                                                <select name="ProjectTaskDTO.ProjectId">
-                                                    @foreach (AllProject project in (IList<Projects>)ViewData["projects"])
-                                                    {
-                                                        <option name="@project.Name">@project.Id</option>
+                                                <select name="ProjectTaskDTO.ProjectId" class="form-control select">
+                                                   
+                                                        @foreach (var project in (IReadOnlyList<AllProject>)ViewData["projects"])
+                                                        {
+                                                            <option value="@project.Id">@project.Name</option>
 
-                                                    }
+                                                        }
+                                                    
 
                                                 </select>
 
                                             </div>
                                             <div class="col-sm-6">
-                                                <input type="text" class="form-control form-control-user"
+                                                <input type="text" class="form-control"
                                                        placeholder="Title" name="ProjectTaskDTO.Title">
                                                 <span asp-validation-for="ProjectTaskDTO.Title" class="text-white badge badge-danger"></span>
                                             </div>
 
-                                            <div class="col-sm-6">
-                                                <textarea class="form-control form-control-user"
-                                                         placeholder="Description" name="ProjectTaskDTO.Description"/>
-                                                    <span asp-validation-for="ProjectTaskDTO.Description" class="text-white badge badge-danger"></span>
-                                            </div>
 
-                                            <div class="col-sm-6">
-                                                <select class="form-control form-control-user"
+
+                                            <div class="col-sm-6 mt-3">
+                                                <select class="form-control select"
                                                         placeholder="Priority" name="ProjectTaskDTO.Priority">
-                                                    <option>HIGH</option>
-                                                    <option>MEDIUM</option>
-                                                    <option>LOW</option>
+                                                    <option value="HIGH" selected>HIGH</option>
+                                                    <option value="MEDIUM">MEDIUM</option>
+                                                    <option value="LOW">LOW</option>
                                                 </select>
-                                                    <span asp-validation-for="ProjectTaskDTO.Priority" class="text-white badge badge-danger"></span>
+                                                <span asp-validation-for="ProjectTaskDTO.Priority" class="text-white badge badge-danger"></span>
+                                            </div>
+
+                                            <div class="col-sm-6 mt-3">
+                                                <textarea class="form-control"
+                                                          placeholder="Description" name="ProjectTaskDTO.TaskDescription"></textarea>
+                                                <span asp-validation-for="ProjectTaskDTO.TaskDescription" class="text-white badge badge-danger"></span>
                                             </div>
 
 
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control form-control-user" id="exampleLastName"
-                                                       placeholder="Last Name" name="RegisterDTO.Lastname">
-                                                <span asp-validation-for="ProjectDTO.Description" class="text-white badge badge-danger"></span>
+                                            <div class="col-sm-6 mt-3">
+                                                Start Date:
+                                                <input type="date" class="form-control"
+                                                       placeholder="Start Date" name="ProjectTaskDTO.FromDate">
+                                                <span asp-validation-for="ProjectTaskDTO.FromDate" class="text-white badge badge-danger"></span>
                                             </div>
+
+                                            <div class="col-sm-6 mt-3">
+                                                End Date:
+                                                <input type="date" class="form-control"
+                                                       placeholder="End Date" name="ProjectTaskDTO.ToDate">
+                                                <span asp-validation-for="ProjectTaskDTO.ToDate" class="text-white badge badge-danger"></span>
+                                            </div>
+
+                                            <div class="col-sm-6 mt-3">
+                                                <select class="form-control" placeholder="Team members" name="ProjectTaskDTO.AssignedTeamMemberIds" multiple>
+                                                </select>
+                                                <span asp-validation-for="ProjectTaskDTO.AssignedTeamMemberIds" class="text-white badge badge-danger"></span>
+                                            </div>
+
                                         </div>
 
-                                        <input type="submit" value="Create Project" class="btn btn-primary btn-user btn-block" />
+                                        <input type="submit" value="Create Project Task" class="btn btn-primary btn-user btn-block" />
 
                                         <div class="mt-2">
                                             @if (ViewData["err"] != null)
@@ -101,7 +119,7 @@
                                             }
                                             else if (ViewData["suc"] != null)
                                             {
-                                                <span class="text-white badge badge-danger">@ViewData["suc"]</span>
+                                                <span class="text-white badge badge-success">@ViewData["suc"]</span>
                                             }
                                         </div>
                                     </form>

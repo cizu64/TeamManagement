@@ -1,5 +1,5 @@
 ﻿@page
-@model ViewProjectsModel
+@model ViewTasksModel
 @{
     ViewData["Title"] = "Create Project";
 }
@@ -28,18 +28,8 @@
                         <div class="card shadow mb-4">
                             <!-- Card Header - Dropdown -->
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">View Projects!</h6>
-                                <div class="dropdown no-arrow">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                         aria-labelledby="dropdownMenuLink">
-                                        <div class="dropdown-header">Dropdown Header:</div>
-                                        <a class="dropdown-item" href="#">View Task</a>
-                                    </div>
-                                </div>
+                                <h6 class="m-0 font-weight-bold text-primary">View Tasks</h6>
+                               
                             </div>
                             <!-- Card Body -->
                             <div class="card-body">
@@ -54,13 +44,18 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach (var project in Model.Projects)
+                                        @foreach (var project in Model.Tasks)
                                         {
                                                 <tr>
                                                     <td>@project.Name</td>
-                                                    <td>@project.Description</td>
-                                                    <td>@project.DateCreated</td>
-                                                    <td>@project.IsActive</td>
+                                                    <td>@project.Title</td>
+                                                    <td>@project.TaskDescription</td>
+                                                    <td>@project.priority</td>
+                                                    <td>@project.status</td>
+                                                    <td>@project.StartDate</td>
+                                                    <td>@project.EndDate</td>
+                                                    <td>@project.isCompleted</td>
+                                                    <td>@project.assignedTo</td>
                                                 </tr>
                                           
                                         }

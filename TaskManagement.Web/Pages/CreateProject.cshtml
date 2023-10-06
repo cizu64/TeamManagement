@@ -49,16 +49,24 @@
                                         @Html.AntiForgeryToken()
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
-                                                <input type="text" class="form-control form-control-user" id="exampleFirstName"
-                                                       placeholder="First Name" name="RegisterDTO.Firstname">
+                                                <input type="text" class="form-control form-control-user"
+                                                       placeholder="Project Name" name="ProjectDTO.Name">
                                                 <span asp-validation-for="ProjectDTO.Name" class="text-white badge badge-danger"></span>
 
                                             </div>
                                             <div class="col-sm-6">
                                                 <input type="text" class="form-control form-control-user" id="exampleLastName"
-                                                       placeholder="Last Name" name="RegisterDTO.Lastname">
+                                                       placeholder="Description" name="ProjectDTO.Description">
                                                 <span asp-validation-for="ProjectDTO.Description" class="text-white badge badge-danger"></span>
                                             </div>
+
+                                            <div class="col-sm-6 mt-3">
+                                                <select class="form-control" name="ProjectDTO.assignedTeamMemberIds" multiple>
+                                                  
+                                                </select>
+                                                <span asp-validation-for="ProjectDTO.assignedTeamMemberIds" class="text-white badge badge-danger"></span>
+                                            </div>
+
                                         </div>
                                        
                                         <input type="submit" value="Create Project" class="btn btn-primary btn-user btn-block" />
@@ -70,7 +78,7 @@
                                             }
                                             else if(ViewData["suc"]!=null)
                                             {
-                                                <span class="text-white badge badge-danger">@ViewData["suc"]</span>
+                                                <span class="text-white badge badge-success">@ViewData["suc"]</span>
                                             }
                                         </div>
                                     </form>

@@ -11,11 +11,11 @@ using TaskManagement.Web.VM;
 namespace TaskManagement.Web.Pages
 {
     [TokenAuthorize(Role: "TeamLead")]
-    public class ViewProjectsModel : PageModel
+    public class ViewTasksModel : PageModel
     {
         private readonly TeamLead teamLead;
 
-        public ViewProjectsModel(TeamLead teamLead)
+        public ViewTasksModel(TeamLead teamLead)
         {
             this.teamLead = teamLead;
         }
@@ -23,7 +23,7 @@ namespace TaskManagement.Web.Pages
         public async Task<IActionResult> OnGet()
         {  
             string token = Request.Cookies["token"].ToString();
-            APIResult project = await teamLead.ViewProjects(token);
+            APIResult project = await teamLead.ViewTasks(token);
             if (project.statusCode != (int)HttpStatusCode.OK)
             {
                 if (project.statusCode == (int)HttpStatusCode.Unauthorized)
@@ -33,12 +33,12 @@ namespace TaskManagement.Web.Pages
                 ViewData["err"] = project.detail; //display the detail of the error
                 return Page();
             }
-            Projects = (IReadOnlyList<AllProject>)project.detail;
+            Tasks = (IReadOnlyList<ProjectTask>)project.detail;
             return Page();
         }
 
         [BindProperty]
-        public IReadOnlyList<AllProject> Projects{ get; set; }
+        public IReadOnlyList<ProjectTask> Tasks{ get; set; }
 
     }
 

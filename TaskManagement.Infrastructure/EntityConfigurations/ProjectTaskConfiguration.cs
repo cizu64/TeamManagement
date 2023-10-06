@@ -17,8 +17,8 @@ namespace TaskManagement.Infrastructure.EntityConfigurations
             var navigation = builder.Metadata.FindNavigation(nameof(ProjectTask.Todo));
             navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            builder.Property(c => c.AssignedTo).IsRequired();
             builder.Property(c => c.ProjectId).IsRequired();
+            builder.Property(c => c.Title).IsRequired();
             builder.Property(c => c.TaskDescription).IsRequired();
             builder.Property(c => c.Priority).IsRequired();
             builder.Property(c => c.FromDate).IsRequired();

@@ -18,7 +18,7 @@ namespace TaskManagement.Infrastructure.EntityConfigurations
             navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             builder.Property(c => c.Name).IsRequired();
-            builder.Property(c => c.AssignedTeamMemberIds).IsRequired();
+            builder.Property(p => p.Description).IsRequired();
             builder.Property(c => c.TeamLeadId).IsRequired();
 
         }

@@ -30,7 +30,7 @@ namespace TaskManagement.Web.Filters
                 var result = await request.Content.ReadFromJsonAsync<TokenValidationResult>();
                 if (result.isvalid && result.role.Equals(Role, StringComparison.OrdinalIgnoreCase))
                 {
-                    context.HttpContext.Response.Cookies.Append("usid", result.usid.ToString());
+                    //context.HttpContext.Response.Cookies.Append("usid", result.usid.ToString());
                     return;
                 }
                 else

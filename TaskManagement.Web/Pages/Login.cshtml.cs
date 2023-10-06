@@ -36,7 +36,7 @@ namespace TaskManagement.Web.Pages
                 ViewData["err"] = token.detail; //display the detail of the error
                 return Page();
             }
-            Response.Cookies.Append("token", token.detail,new CookieOptions
+            Response.Cookies.Append("token", (string)token.detail,new CookieOptions
             {
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,

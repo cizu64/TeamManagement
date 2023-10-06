@@ -35,7 +35,7 @@ namespace TaskManagement.Web.Pages
             }
             //login
             APIResult token = await teamLead.Login(RegisterDTO.Email, RegisterDTO.Password);
-            Response.Cookies.Append("token", token.detail, new CookieOptions
+            Response.Cookies.Append("token", (string)token.detail, new CookieOptions
             {
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,

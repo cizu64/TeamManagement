@@ -4,6 +4,7 @@ using System.Net;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Domain.SeedWork;
 using TaskManagement.WebAPI.DTO;
+using TaskManagement.WebAPI.Filter;
 using TaskManagement.WebAPI.Security;
 
 namespace TaskManagement.WebAPI.Controllers
@@ -48,83 +49,111 @@ namespace TaskManagement.WebAPI.Controllers
         }
 
         //create project
-        [HttpPost, Authorize(Policy = "TeamLead")]
+        [HttpPost, Authorize(Policy = "TeamLeadOnly"), ValidationFilter]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO dto)
         {
-            int teamLeadId = 0;
-            int.TryParse(User.Identity.Name, out int teamLeadId);
-            await _projectRepo.AddAsync(new Project(dto.Name,teamLeadId, dto.Description, dto.AssignedTeamMemberIds));
+            int teamLeadId;
+            int.TryParse(User.Identity.Name, out teamLeadId);
+            string Ids = "";
+            if (dto.AssignedTeamMemberIds!=null && dto.AssignedTeamMemberIds.Length != 0)
+            {
+                foreach (var ids in dto.AssignedTeamMemberIds)
+                {
+                    Ids += $"{ids}_";
+                }
+            }
+            await _projectRepo.AddAsync(new Project(dto.Name, teamLeadId, dto.Description, Ids));
             await _projectRepo.UnitOfWork.SaveAsync();
-            return Ok($"""Project "{dto.Name}" created successfully"""); //using the new c# raw string literal 
+            return Ok($"""Project({dto.Name}) created successfully"""); //using the new c# raw string literal 
         }
 
         //view project
-        [HttpGet("{Id:int}"), Authorize(Policy="TeamLead")]
+        [HttpGet("{Id:int}"), Authorize(Policy= "TeamLeadOnly")]
         public async Task<IActionResult> ViewProject(int Id)
         {
             int teamLeadId = 0;
-            int.TryParse(User.Identity.Name,out int teamLeadId);
+            if(!int.TryParse(User.Identity.Name,out teamLeadId)) return Problem(detail: "Anthorization required", statusCode: (int)HttpStatusCode.InternalServerError);
             var project = await _projectRepo.Get(p => p.Id == Id && p.TeamLeadId == teamLeadId);
             return Ok(project);
         }
 
         //view projects
-        [HttpGet, Authorize(Policy = "TeamLead")]
+        [HttpGet, Authorize(Policy = "TeamLeadOnly")]
         public async Task<IActionResult> ViewProjects()
         {
             int teamLeadId = 0;
-            int.TryParse(User.Identity.Name, out int teamLeadId);
+            int.TryParse(User.Identity.Name, out teamLeadId);
             var projects = await _projectRepo.GetAll(p => p.TeamLeadId == teamLeadId);
             return Ok(projects);
         }
 
         //create project task
-        [HttpPost, Authorize(Policy = "TeamLead")]
+        [HttpPost, Authorize(Policy = "TeamLeadOnly")]
         public async Task<IActionResult> CreateProjectTask([FromBody] CreateProjectTaskDTO dto)
         {
-            int teamLeadId = 0;
-            int.TryParse(User.Identity.Name, out int teamLeadId);            
-            await _projectTaskRepo.AddAsync(new ProjectTask(teamLeadId,dto.ProjectId,dto.Title,dto.TaskDescription,nameof(dto.Priority).ToString(),dto.AssignedTo,dto.FromDate,dto.ToDate));
+            int teamLeadId;
+            int.TryParse(User.Identity.Name, out teamLeadId);
+            string Ids = "";
+            if (dto.AssignedTo != null && dto.AssignedTo.Length != 0)
+            {
+                foreach (var ids in dto.AssignedTo)
+                {
+                    Ids += $"{ids}_";
+                }
+            }
+            await _projectTaskRepo.AddAsync(new ProjectTask(teamLeadId,dto.ProjectId,dto.Title,dto.TaskDescription,dto.Priority,Ids,dto.FromDate,dto.ToDate));
             await _projectTaskRepo.UnitOfWork.SaveAsync();
             return Ok($"Project task created successfully");
         }
         //view project task
-        [HttpGet("{Id:int}")]
-        public async Task<IActionResult> ViewProjectTask(int Id)
+        [HttpGet, Authorize(Policy = "TeamLeadOnly")]
+        public async Task<IActionResult> ViewProjectTasks()
         {
             int teamLeadId = 0; //should come from the current logged in user
-            var projectTask = await _projectTaskRepo.Get(p => p.Id == Id && p.Project.TeamLeadId == teamLeadId);
-            ArgumentNullException.ThrowIfNull(projectTask); //guard clauses
-            return Ok(projectTask);
+            int.TryParse(User.Identity.Name, out teamLeadId);
+            var projectTask = await _projectTaskRepo.GetAll(t => t.TeamLeadId == teamLeadId, "Project");
+            return Ok(projectTask.Select(t => new
+            {
+                t.Project.Name,
+                t.Title,
+                t.TaskDescription,
+                t.Priority,
+                Status = t.IsActive,
+                StartDate = t.FromDate,
+                EndDate = t.ToDate,
+                t.IsCompleted,
+                t.AssignedTo,
+                t.DateCreated
+            }));
         }
 
         //create team members
-        [HttpPost]
+        [HttpPost, Authorize(Policy = "TeamLeadOnly")]
         public async Task<IActionResult> CreateTeamMember([FromBody] CreateTeamMemberDTO dto)
         {
             await _teamMemberRepo.AddAsync(new TeamMember(dto.CountryId, dto.TeamLeadId, dto.Email, dto.FirstName, dto.LastName, dto.Password));
             await _projectTaskRepo.UnitOfWork.SaveAsync();
             return Ok($"Team member created successfully");
         }
-        //view team members
-        [HttpGet]
-        public async Task<IActionResult> ViewTeamMembers()
-        {
-            int teamLeadId = 0; //should come from the current logged in user
-            var teamMembers = await _teamMemberRepo.GetAll(t => t.TeamLeadId == teamLeadId);
-            ArgumentNullException.ThrowIfNull(teamMembers); //guard clauses
-            return Ok(teamMembers);
-        }
+        ////view team members
+        //[HttpGet, Authorize(Policy = "TeamLeadOnly")]
+        //public async Task<IActionResult> ViewTeamMembers()
+        //{
+        //    int teamLeadId = 0; //should come from the current logged in user
+        //    var teamMembers = await _teamMemberRepo.GetAll(t => t.TeamLeadId == teamLeadId);
+        //    ArgumentNullException.ThrowIfNull(teamMembers); //guard clauses
+        //    return Ok(teamMembers);
+        //}
 
-        //view team member
-        [HttpGet("{Id:int}")]
-        public async Task<IActionResult> ViewTeamMembers(int Id)
-        {
-            int teamLeadId = 0; //should come from the current logged in user
-            var teamMember = await _teamMemberRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == Id);
-            ArgumentNullException.ThrowIfNull(teamMember); //guard clauses
-            return Ok(teamMember);
-        }
+        ////view team member
+        //[HttpGet("{Id:int}")]
+        //public async Task<IActionResult> ViewTeamMembers(int Id)
+        //{
+        //    int teamLeadId = 0; //should come from the current logged in user
+        //    var teamMember = await _teamMemberRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == Id);
+        //    ArgumentNullException.ThrowIfNull(teamMember); //guard clauses
+        //    return Ok(teamMember);
+        //}
 
         //assign team members to project
         [HttpPut("{ProjectId:int}")]

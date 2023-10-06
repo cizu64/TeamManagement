@@ -47,10 +47,11 @@ namespace TaskManagement.Web.Pages
 
     public class ProjectDTO
     {
-        [Required]
+        [Required(ErrorMessage = "The Project Name is Required")]
         public string Name { get; set; }
-        [Required]
+        [Required(ErrorMessage ="The Project Description is Required")]
         public string Description { get; set; }
-        public string[] assignedTeamMemberIds { get; set; }
+        
+        public string[]? assignedTeamMemberIds { get; set; }
     }
 }

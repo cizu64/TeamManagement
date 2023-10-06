@@ -32,7 +32,7 @@ namespace TaskManagement.Web.Services
                 };
             }
             var errorDetails = await request.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
             return result;
         }
 
@@ -57,7 +57,7 @@ namespace TaskManagement.Web.Services
                 };
             }
             var errorDetails = await request.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
             return result;
         }
 
@@ -72,7 +72,7 @@ namespace TaskManagement.Web.Services
             };
             var headers = new Dictionary<string, string>
             {
-                { "Authorization", token }
+                { "Authorization", $"Bearer {token}" }
             };
 
             var request = await _client.SendRequestAsync(HttpMethod.Post, "/CreateProject", "TeamLead", data, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
@@ -86,7 +86,7 @@ namespace TaskManagement.Web.Services
                 };
             }
             var errorDetails = await request.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
             return result;
         }
 
@@ -94,7 +94,7 @@ namespace TaskManagement.Web.Services
         {
             var headers = new Dictionary<string, string>
             {
-                { "Authorization", token }
+                { "Authorization", $"Bearer {token}" }
             };
 
             var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProject/{projectId}", "TeamLead", null , headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
@@ -108,7 +108,7 @@ namespace TaskManagement.Web.Services
                 };
             }
             var errorDetails = await request.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
             return result;
         }
 
@@ -116,39 +116,40 @@ namespace TaskManagement.Web.Services
         {
             var headers = new Dictionary<string, string>
             {
-                { "Authorization", token }
+                { "Authorization", $"Bearer {token}" }
             };
 
             var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProjects", "TeamLead", null, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
             if (request.IsSuccessStatusCode)
             {
-                var project = await request.Content.ReadFromJsonAsync<IList<Projects>>();
+                var project = await request.Content.ReadFromJsonAsync<IReadOnlyList<AllProject>>();
                 return new APIResult
                 {
                     detail = project,
                     statusCode = (int)request.StatusCode
                 };
             }
+
             var errorDetails = await request.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
             return result;
         }
 
-        public async Task<APIResult> AddTask(string token,int projectId, string[] assignedTo, string title, string description, string priority, DateTime from, DateTime to)
+        public async Task<APIResult> AddTask(string token,int projectId, string[] assignedTo, string title, string description, string priority, string from, string to)
         {
             var data = new
             {
-                from,
+                FromDate = from,
                 assignedTo,
-                to,
+                ToDate = to,
                 priority,
                 projectId,
                 title,
-                description
+                TaskDescription = description
             };
             var headers = new Dictionary<string, string>
             {
-                { "Authorization", token }
+                { "Authorization", $"Bearer {token}" }
             };
 
             var request = await _client.SendRequestAsync(HttpMethod.Post, "/CreateProjectTask", "TeamLead", data, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
@@ -162,8 +163,31 @@ namespace TaskManagement.Web.Services
                 };
             }
             var errorDetails = await request.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<APIResult>(errorDetails);
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
             return result;
         }
+        public async Task<APIResult> ViewTasks(string token)
+        {
+            var headers = new Dictionary<string, string>
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProjects", "TeamLead", null, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            if (request.IsSuccessStatusCode)
+            {
+                var project = await request.Content.ReadFromJsonAsync<IReadOnlyList<AllProject>>();
+                return new APIResult
+                {
+                    detail = project,
+                    statusCode = (int)request.StatusCode
+                };
+            }
+
+            var errorDetails = await request.Content.ReadAsStringAsync();
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
+            return result;
+        }
+
     }
 }

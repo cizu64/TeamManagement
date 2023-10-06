@@ -28,7 +28,7 @@
                         <div class="card shadow mb-4">
                             <!-- Card Header - Dropdown -->
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Create a new Project!</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">@Model.ViewProject.Name</h6>
                                 <div class="dropdown no-arrow">
                                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,19 +45,33 @@
                             <!-- Card Body -->
                             <div class="card-body">
                                 <div class="chart-area">
-
+                                  
                                     <p class="strong">
-                                        @Model.Name
+                                       Project Name:
+                                        <input type="text" class="form-control form-control-user"
+                                               placeholder="Description" name="ViewProject.Name" value="@Model.ViewProject.Name">
+                                        <span asp-validation-for="ViewProject.Name" class="text-white badge badge-danger"></span>
                                     </p>
 
                                     <p>
-                                        @Model.Description
+                                        Project Description:
+                                        <textarea class="form-control form-control-user"
+                                                  placeholder="Description" name="ViewProject.Description">"@Model.ViewProject.Description</textarea>
+                                        <span asp-validation-for="ViewProject.Description" class="text-white badge badge-danger"></span>
                                     </p>
 
                                     <p>
-                                        @Model.DateCreated
+                                        Date Created:
+                                        <input disabled type="datetime" class="form-control form-control-user"
+                                               name="ViewProject.DateCreated" id="dateCreated" value="@Model.ViewProject.DateCreated">
                                     </p>
-
+                                    <p>
+                                        Assigned team members:
+                                        <p>
+                                            @Model.ViewProject.assignedTeamMemberIds
+                                        </p>
+                                    </p>
+                                      
                                 </div>
                             </div>
                         </div>
