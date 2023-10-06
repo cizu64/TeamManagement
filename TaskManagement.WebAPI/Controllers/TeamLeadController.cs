@@ -131,7 +131,9 @@ namespace TaskManagement.WebAPI.Controllers
         [HttpPost, Authorize(Policy = "TeamLeadOnly")]
         public async Task<IActionResult> CreateTeamMember([FromBody] CreateTeamMemberDTO dto)
         {
-            await _teamMemberRepo.AddAsync(new TeamMember(dto.CountryId, dto.TeamLeadId, dto.Email, dto.FirstName, dto.LastName, dto.Password));
+            int teamLeadId = 0; //should come from the current logged in user
+            int.TryParse(User.Identity.Name, out teamLeadId);
+            await _teamMemberRepo.AddAsync(new TeamMember(dto.CountryId, teamLeadId, dto.Email, dto.FirstName, dto.LastName, dto.Password));
             await _projectTaskRepo.UnitOfWork.SaveAsync();
             return Ok($"Team member created successfully");
         }
