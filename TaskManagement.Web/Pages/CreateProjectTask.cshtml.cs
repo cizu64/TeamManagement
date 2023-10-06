@@ -41,7 +41,7 @@ namespace TaskManagement.Web.Pages
                 return Page();
             }
             var fromDate = ProjectTaskDTO.FromDate.ToString("yyyy-M-dd");
-            var toDate = ProjectTaskDTO.FromDate.ToString("yyyy-M-dd");
+            var toDate = ProjectTaskDTO.ToDate.ToString("yyyy-M-dd");
 
             APIResult addTask = await teamLead.AddTask(token, ProjectTaskDTO.ProjectId, ProjectTaskDTO.AssignedTeamMemberIds, ProjectTaskDTO.Title, ProjectTaskDTO.TaskDescription, ProjectTaskDTO.Priority, fromDate, toDate);
 

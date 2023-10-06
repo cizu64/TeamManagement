@@ -23,22 +23,22 @@ namespace TaskManagement.Web.Pages
         public async Task<IActionResult> OnGet()
         {  
             string token = Request.Cookies["token"].ToString();
-            APIResult project = await teamLead.ViewTasks(token);
-            if (project.statusCode != (int)HttpStatusCode.OK)
+            APIResult tasks = await teamLead.ViewTasks(token);
+            if (tasks.statusCode != (int)HttpStatusCode.OK)
             {
-                if (project.statusCode == (int)HttpStatusCode.Unauthorized)
+                if (tasks.statusCode == (int)HttpStatusCode.Unauthorized)
                 {
                     return RedirectToPage("/login");
                 }
-                ViewData["err"] = project.detail; //display the detail of the error
+                ViewData["err"] = tasks.detail; //display the detail of the error
                 return Page();
             }
-            Tasks = (IReadOnlyList<ProjectTask>)project.detail;
+            Tasks = (ProjectTask[])tasks.detail;
             return Page();
         }
 
         [BindProperty]
-        public IReadOnlyList<ProjectTask> Tasks{ get; set; }
+        public ProjectTask[] Tasks{ get; set; }
 
     }
 

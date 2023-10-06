@@ -173,13 +173,13 @@ namespace TaskManagement.Web.Services
                 { "Authorization", $"Bearer {token}" }
             };
 
-            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProjects", "TeamLead", null, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProjectTasks", "TeamLead", null, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
             if (request.IsSuccessStatusCode)
             {
-                var project = await request.Content.ReadFromJsonAsync<IReadOnlyList<AllProject>>();
+                var tasks = await request.Content.ReadFromJsonAsync<ProjectTask[]>();
                 return new APIResult
                 {
-                    detail = project,
+                    detail = tasks,
                     statusCode = (int)request.StatusCode
                 };
             }

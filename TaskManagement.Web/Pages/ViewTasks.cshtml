@@ -1,7 +1,7 @@
 ﻿@page
 @model ViewTasksModel
 @{
-    ViewData["Title"] = "Create Project";
+    ViewData["Title"] = "View Tasks";
 }
 
 <!-- Page Wrapper -->
@@ -34,26 +34,31 @@
                             <!-- Card Body -->
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <table id="projectTbl" class="display">
+                                    <table id="taskTbl" class="display">
                                         <thead>
                                             <tr>
                                                 <th>Name</th>
-                                                <th>Description</th>
-                                                <th>Date Created</th>
-                                                <th>Active</th>
+                                                <th>Title</th>
+                                                <th>TaskDescription</th>
+                                                <th>priority</th>
+                                                <th>status</th>
+                                                <th>StartDate</th>
+                                                <th>EndDate</th>
+                                                <th>isCompleted</th>
+                                                <th>assignedTo</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                         @foreach (var project in Model.Tasks)
                                         {
                                                 <tr>
-                                                    <td>@project.Name</td>
-                                                    <td>@project.Title</td>
-                                                    <td>@project.TaskDescription</td>
+                                                    <td>@project.name</td>
+                                                    <td>@project.title</td>
+                                                    <td>@project.taskDescription</td>
                                                     <td>@project.priority</td>
                                                     <td>@project.status</td>
-                                                    <td>@project.StartDate</td>
-                                                    <td>@project.EndDate</td>
+                                                    <td>@project.startDate</td>
+                                                    <td>@project.endDate</td>
                                                     <td>@project.isCompleted</td>
                                                     <td>@project.assignedTo</td>
                                                 </tr>
