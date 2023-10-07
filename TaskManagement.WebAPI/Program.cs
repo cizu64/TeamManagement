@@ -140,7 +140,6 @@ builder.Services.AddHealthChecks().AddSqlServer(builder.Configuration["Connectio
 var app = builder.Build();
 
 await SeedAsync(app);
-app.UseAuthorization();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
