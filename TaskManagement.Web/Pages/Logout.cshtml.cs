@@ -5,8 +5,10 @@ namespace TaskManagement.Web.Pages
 {
     public class LogoutModel : PageModel
     {
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            Response.Cookies.Delete("token");
+            return RedirectToPage("/login");
         }
     }
 }

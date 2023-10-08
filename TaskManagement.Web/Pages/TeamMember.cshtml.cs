@@ -6,11 +6,11 @@ using TaskManagement.Web.Attributes;
 namespace TaskManagement.Web.Pages
 {
     [TokenAuthorize(Role:"TeamLead")]
-    public class IndexModel : PageModel
+    public class TeamMember : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
+        private readonly ILogger<TeamMember> _logger;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public TeamMember(ILogger<TeamMember> logger)
         {
             _logger = logger;
         }
@@ -23,9 +23,9 @@ namespace TaskManagement.Web.Pages
             {
                 return RedirectToPage("/login");
             }
-            if (role.Equals("TeamMember"))
+            if (role.Equals("TeamLead"))
             {
-                return RedirectToPage("/TeamMember");
+                return RedirectToPage("/TeamLead");
             }
             return Page();
         }

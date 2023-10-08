@@ -30,8 +30,22 @@ namespace TaskManagement.Web.Services
                 return new APIResult
                 {
                     detail= token,
-                    statusCode = (int)request.StatusCode
+                    statusCode = (int)request.StatusCode,
                 };
+            }
+            //check if user is a team member
+            else
+            {
+                var tmRequest = await _client.SendRequestAsync(HttpMethod.Post, "/Signin", "TeamMember", data, null);
+                if (tmRequest.IsSuccessStatusCode)
+                {
+                    var token = await tmRequest.Content.ReadFromJsonAsync<string>();
+                    return new APIResult
+                    {
+                        detail = token,
+                        statusCode = (int)tmRequest.StatusCode,
+                    };
+                }
             }
             var errorDetails = await request.Content.ReadAsStringAsync();
             var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);

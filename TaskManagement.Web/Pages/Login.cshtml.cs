@@ -5,6 +5,8 @@ using System.Net;
 using System.Text.Encodings.Web;
 using System.Web;
 using TaskManagement.Web.Common;
+using TaskManagement.Web.Extensions;
+using TaskManagement.Web.Filters;
 using TaskManagement.Web.Services;
 
 namespace TaskManagement.Web.Pages
@@ -12,14 +14,16 @@ namespace TaskManagement.Web.Pages
     public class LoginModel : PageModel
     {
         private readonly TeamLead teamLead;
-
-        public LoginModel(TeamLead teamLead)
+        IHttpClientFactory _client;
+        public LoginModel(TeamLead teamLead, IHttpClientFactory client)
         {
             this.teamLead = teamLead;
+            _client = client;
         }
-        
+
         public async Task<IActionResult> OnGet()
         {
+
             return Page();
         }
         [BindProperty]
@@ -42,6 +46,17 @@ namespace TaskManagement.Web.Pages
                 SameSite = SameSiteMode.Strict,
                 Secure=true
             });
+
+            //validate token and get the role (can be return form the backend. Just for Demo purposes)
+            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ValidateToken?token={(string)token.detail}", "TokenValidation", token, null);
+            if (request.IsSuccessStatusCode)
+            {
+                var result = await request.Content.ReadFromJsonAsync<TokenValidationResult>();
+                if (result!=null && result.isvalid)
+                {
+                    Response.Cookies.Append("role", result.role);
+                }
+            }
             return RedirectToPage("/index");
         }
     }

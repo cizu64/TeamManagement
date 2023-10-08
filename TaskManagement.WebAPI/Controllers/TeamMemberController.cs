@@ -59,8 +59,8 @@ namespace TaskManagement.WebAPI.Controllers
 
             return Ok(lstProjects);
         }
-        [HttpGet("{projectId:int}"), Authorize(Policy = "TeamMemberOnly")]
-        public async Task<IActionResult> ViewProjectTask(int projectId)
+        [HttpGet, Authorize(Policy = "TeamMemberOnly")]
+        public async Task<IActionResult> ViewProjectTask()
         {
             int teamMemberId; //current loggedin team member id
             int.TryParse(User.Identity.Name, out teamMemberId);
@@ -99,6 +99,7 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> SignIn([FromBody] SignInDTO dto)
         {
             string token = await auth.AuthenticateTeamMember(dto.Email, dto.Password);
+            if (token == string.Empty) return Problem(detail: "Invalid email or password", statusCode: (int)HttpStatusCode.InternalServerError);
             return Ok(token);
         }
     }

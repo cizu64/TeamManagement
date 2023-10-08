@@ -23,12 +23,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-//add a named client
+//add a named client for TeamLead
 builder.Services.AddHttpClient("TeamLead", configure =>
 {
     configure.BaseAddress = new Uri("https://localhost:7138/TeamLead");
     configure.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
 }).AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(3, retryNumner => TimeSpan.FromSeconds(20)));
+
+builder.Services.AddHttpClient("TeamMember", configure =>
+{
+    configure.BaseAddress = new Uri("https://localhost:7138/TeamMember");
+    configure.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+}).AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(3, retryNumner => TimeSpan.FromSeconds(20)));
+
 
 //add a named client for country
 builder.Services.AddHttpClient("Country", configure =>
@@ -45,6 +52,7 @@ builder.Services.AddHttpClient("TokenValidation", configure =>
 
 
 builder.Services.AddScoped<TeamLead>();
+builder.Services.AddScoped<TeamMember>();
 builder.Services.AddScoped<Country>();
 builder.Services.AddScoped<TokenAuth>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

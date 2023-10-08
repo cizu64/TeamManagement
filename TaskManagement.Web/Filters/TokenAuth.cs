@@ -24,11 +24,16 @@ namespace TaskManagement.Web.Filters
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             string token = context.HttpContext.Request.Cookies["token"];
+            if (string.IsNullOrEmpty(token))
+            {
+                context.HttpContext.Response.Redirect("/login"); //redirect to login page
+                return;
+            }
             var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ValidateToken?token={token}", "TokenValidation", token, null);
             if (request.IsSuccessStatusCode)
             {
                 var result = await request.Content.ReadFromJsonAsync<TokenValidationResult>();
-                if (result.isvalid && result.role.Equals(Role, StringComparison.OrdinalIgnoreCase))
+                if (result.isvalid)
                 {
                     context.HttpContext.Response.Cookies.Append("fname", result.name.ToString());
                     return;

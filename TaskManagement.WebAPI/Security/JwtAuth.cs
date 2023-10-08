@@ -45,7 +45,6 @@ namespace TaskManagement.WebAPI.Security
         {
             var teamMember = await _teamMemberRepo.Get(t => t.Email.ToLower() == email.ToLower() && t.Password == password);
             if (teamMember == null) return string.Empty;
-            ArgumentNullException.ThrowIfNull(teamMember);
             var tokenHandler = new JwtSecurityTokenHandler();
             byte[] key = new byte[128];
             var claims = new List<Claim>
