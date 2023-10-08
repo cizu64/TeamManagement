@@ -19,7 +19,7 @@ namespace TaskManagement.Web.Services
             var request =  await _client.SendRequestAsync(HttpMethod.Get,"/GetCountries", "Country",null); //the base url is null because we are using a named instance that defines the base url in the program.cs class
             if (request.IsSuccessStatusCode)
             {
-                var tasks = await request.Content.ReadFromJsonAsync<Country[]>();
+                var tasks = await request.Content.ReadFromJsonAsync<VM.Countries[]>();
                 return new APIResult
                 {
                     detail = tasks,

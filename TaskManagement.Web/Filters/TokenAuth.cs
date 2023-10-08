@@ -10,7 +10,7 @@ namespace TaskManagement.Web.Filters
     {
         public string role { get; set; }
         public bool isvalid { get; set; }
-        public int usid { get; set; }
+        public string name { get; set; }
     }
     public class TokenAuth : IAsyncAuthorizationFilter
     {
@@ -30,7 +30,7 @@ namespace TaskManagement.Web.Filters
                 var result = await request.Content.ReadFromJsonAsync<TokenValidationResult>();
                 if (result.isvalid && result.role.Equals(Role, StringComparison.OrdinalIgnoreCase))
                 {
-                    //context.HttpContext.Response.Cookies.Append("usid", result.usid.ToString());
+                    context.HttpContext.Response.Cookies.Append("fname", result.name.ToString());
                     return;
                 }
                 else

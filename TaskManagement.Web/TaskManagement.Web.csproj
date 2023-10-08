@@ -9,6 +9,9 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
+    <Content Remove="Pages\Logout.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.11" />
     <PackageReference Include="System.Text.Json" Version="7.0.0" />
@@ -16,5 +19,17 @@
 
   <ItemGroup>
     <None Remove="VM\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\Logout.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Logout.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\Logout.cshtml" />
   </ItemGroup>
 </Project>

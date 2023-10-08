@@ -45,7 +45,10 @@ builder.Services.AddHttpClient("TokenValidation", configure =>
 
 
 builder.Services.AddScoped<TeamLead>();
+builder.Services.AddScoped<Country>();
 builder.Services.AddScoped<TokenAuth>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

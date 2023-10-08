@@ -1,8 +1,9 @@
 ﻿@page
 @using TaskManagement.Web.VM;
+@using static TaskManagement.Web.VM.TeamMemberVM;
 @model AssignProjectModel
 @{
-    ViewData["Title"] = "Create Project";
+    ViewData["Title"] = "Assign Project";
 }
 
 <!-- Page Wrapper -->
@@ -51,7 +52,7 @@
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
 
-                                                <select name="AssignProjectDTO.proectId" class="form-control select">
+                                                <select name="AssignProjectDTO.projectId" class="form-control select">
 
                                                     @foreach (var project in (IReadOnlyList<AllProject>)ViewData["projects"])
                                                     {
@@ -67,7 +68,7 @@
 
                                                     @foreach (var tm in (TeamMembers[])ViewData["tm"])
                                                     {
-                                                        <option value="@tm.Id">@tm.Firstname +"-"+ tm.Lastname</option>
+                                                        <option value="@tm.Id">@tm.Firstname @tm.Lastname (@tm.Email)</option>
                                                     }
                                                 </select>
                                             </div>

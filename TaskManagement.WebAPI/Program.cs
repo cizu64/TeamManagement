@@ -86,6 +86,11 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim(ClaimTypes.Role);
         policy.RequireRole("TeamLead");
     });
+    options.AddPolicy("TeamMemberOnly", policy =>
+    {
+        policy.RequireClaim(ClaimTypes.Role);
+        policy.RequireRole("TeamMember");
+    });
 });
 
 

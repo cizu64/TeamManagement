@@ -7,6 +7,7 @@ using TaskManagement.Web.Attributes;
 using TaskManagement.Web.Common;
 using TaskManagement.Web.Services;
 using TaskManagement.Web.VM;
+using static TaskManagement.Web.VM.TeamMemberVM;
 
 namespace TaskManagement.Web.Pages
 {
@@ -24,7 +25,7 @@ namespace TaskManagement.Web.Pages
         {
             string token = Request.Cookies["token"].ToString();
             var teamMembers = await teamLead.ViewTeamMembers(token);
-            ViewData["tm"] = teamMembers.detail as VM.TeamMembers[];
+            ViewData["tm"] = teamMembers.detail as TeamMembers[];
 
             APIResult projects = await teamLead.ViewProjects(token);
             ViewData["projects"] = projects.detail as IReadOnlyList<AllProject>;
@@ -37,7 +38,7 @@ namespace TaskManagement.Web.Pages
         {
             string token = Request.Cookies["token"].ToString();
             var teamMembers = await teamLead.ViewTeamMembers(token);
-            ViewData["tm"] = teamMembers.detail as VM.TeamMembers[];
+            ViewData["tm"] = teamMembers.detail as TeamMembers[];
 
             APIResult projects = await teamLead.ViewProjects(token);
             ViewData["projects"] = projects.detail as IReadOnlyList<AllProject>;

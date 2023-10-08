@@ -27,7 +27,8 @@ namespace TaskManagement.WebAPI.Security
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, teamLead.Id.ToString()),
-                new Claim(ClaimTypes.Role, teamLead.Role)
+                new Claim(ClaimTypes.Role, teamLead.Role),
+                new Claim(ClaimTypes.GivenName, $"{teamLead.Firstname} {teamLead.Lastname}")
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -50,7 +51,8 @@ namespace TaskManagement.WebAPI.Security
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, teamMember.Id.ToString()),
-                new Claim(ClaimTypes.Role, teamMember.Role)
+                new Claim(ClaimTypes.Role, teamMember.Role),
+                new Claim(ClaimTypes.GivenName, $"{teamMember.Firstname} {teamMember.Lastname}")
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

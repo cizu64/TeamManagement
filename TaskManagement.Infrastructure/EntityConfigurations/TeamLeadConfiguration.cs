@@ -19,7 +19,6 @@ namespace TaskManagement.Infrastructure.EntityConfigurations
             var navigationTM = builder.Metadata.FindNavigation(nameof(TeamLead.TeamMembers));
             navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-
             builder.Property(t => t.Lastname).IsRequired();
             builder.Property(t => t.Firstname).IsRequired();
             builder.Property(t => t.Email).IsRequired();

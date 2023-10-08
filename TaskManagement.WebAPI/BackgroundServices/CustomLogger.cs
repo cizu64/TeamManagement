@@ -27,7 +27,7 @@ namespace TaskManagement.WebAPI.BackgroundServices
             {
                 foreach (var log in Logger.Logs)
                 {
-                    await context.Log.AddAsync(log);
+                    await context.Log.AddAsync(new Log(log.Message, log.ShortMessage));
                     
                 }
                 await context.SaveChangesAsync();

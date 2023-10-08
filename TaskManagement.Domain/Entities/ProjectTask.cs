@@ -39,5 +39,11 @@ namespace TaskManagement.Domain.Entities
         //navigational property
         private readonly List<Todo> todo = new();
         public IReadOnlyCollection<Todo> Todo => todo.AsReadOnly();
+
+        //domain behavior
+        public void AssignTeamMember(int teamMemberId)
+        {
+            AssignedTo += $"{teamMemberId}_"; //ids should be seperated with underscore
+        }
     }
 }

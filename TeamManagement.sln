@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskManagement.Infrastructu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskManagement.WebAPI", "TaskManagement.WebAPI\TaskManagement.WebAPI.csproj", "{E9BCAA42-DD7E-4EE7-BF1A-469CFD1CA647}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Web", "TaskManagement.Web\TaskManagement.Web.csproj", "{1AEDA3F9-29DB-4C5B-BA69-01C97D3CD9A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskManagement.Web", "TaskManagement.Web\TaskManagement.Web.csproj", "{1AEDA3F9-29DB-4C5B-BA69-01C97D3CD9A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

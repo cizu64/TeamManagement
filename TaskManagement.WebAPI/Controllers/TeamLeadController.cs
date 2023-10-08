@@ -49,7 +49,7 @@ namespace TaskManagement.WebAPI.Controllers
         }
 
         //create project
-        [HttpPost, Authorize(Policy = "TeamLeadOnly"), ValidationFilter]
+        [HttpPost, Authorize(Policy = "TeamLeadOnly")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO dto)
         {
             int teamLeadId;
@@ -78,8 +78,16 @@ namespace TaskManagement.WebAPI.Controllers
             string Members = "";
             foreach (var id in teamMembers)
             {
-                var tm = await _teamMemberRepo.Get(t => t.Id == id);
-                Members += $"{tm.Firstname} {tm.Lastname} -> ";
+                int validId;
+                if (!string.IsNullOrEmpty(id) && int.TryParse(id, out validId))
+                {
+                    var tm = await _teamMemberRepo.Get(t => t.Id == validId);
+                    Members += $"{tm.Firstname} {tm.Lastname} -> ";
+                }
+                else
+                {
+                    Members += "";
+                }
 
             }
             return Ok(new
@@ -99,22 +107,36 @@ namespace TaskManagement.WebAPI.Controllers
             int.TryParse(User.Identity.Name, out teamLeadId);
 
             var projects = await _projectRepo.GetAll(p => p.TeamLeadId == teamLeadId);
-
-            var teamMembers = projects.Select(t => t.AssignedTeamMemberIds).Split("_");
-            string Members = "";
-            foreach (var id in teamMembers)
+            List<object> lst = new();
+            string members = "";
+            foreach (var p in projects)
             {
-                var tm = await _teamMemberRepo.Get(t => t.Id == id);
-                Members += $"{tm.Firstname} {tm.Lastname} -> ";
-
+                var ids = p.AssignedTeamMemberIds.Split('_');
+                foreach (var id in ids)
+                {
+                    int validId;
+                    if (!string.IsNullOrEmpty(id) && int.TryParse(id, out validId))
+                    {
+                        var member = await _teamMemberRepo.Get(t => t.Id == validId);
+                        members += $"{member.Firstname} {member.Lastname} ->";                  
+                    }
+                    else
+                    {
+                        members += "";                      
+                    }
+                }
+                lst.Add(new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Description,
+                    p.DateCreated,
+                    p.IsActive,
+                    AssignedTeamMemberIds = members
+                });
+                members = "";
             }
-            return Ok(projects.Select(p => new
-            {
-                p.Name,
-                p.Description,
-                p.DateCreated,
-                AssignedTeamMemberIds = Members
-            }));
+            return Ok(lst);
         }
 
         //create project task
@@ -139,31 +161,45 @@ namespace TaskManagement.WebAPI.Controllers
         [HttpGet, Authorize(Policy = "TeamLeadOnly")]
         public async Task<IActionResult> ViewProjectTasks()
         {
-            int teamLeadId = 0; //should come from the current logged in user
+            int teamLeadId = 0;
             int.TryParse(User.Identity.Name, out teamLeadId);
-            var projectTask = await _projectTaskRepo.GetAll(t => t.TeamLeadId == teamLeadId, "Project");
-            var teamMembers = projectTask.Select(t => t.AssignedTo).Split("_");
-            string Members = "";
-            foreach (var id in teamMembers)
-            {
-                var tm = await _teamMemberRepo.Get(t => t.Id == id);
-                Members += $"{tm.Firstname} {tm.Lastname} -> ";
 
-            }
-            return Ok(projectTask.Select(t => new
+            var projectTask = await _projectTaskRepo.GetAll(t => t.TeamLeadId == teamLeadId, "Project");
+            List<object> lst = new();
+            string members = "";
+            foreach (var p in projectTask)
             {
-                t.Id,
-                t.Project.Name,
-                t.Title,
-                t.TaskDescription,
-                t.Priority,
-                Status = t.IsActive,
-                StartDate = t.FromDate,
-                EndDate = t.ToDate,
-                t.IsCompleted,
-                AssignedTo = Members,
-                t.DateCreated
-            }));
+                var ids = p.AssignedTo.Split('_');
+                foreach (var id in ids)
+                {
+                    int validId;
+                    if (!string.IsNullOrEmpty(id) && int.TryParse(id, out validId))
+                    {
+                        var member = await _teamMemberRepo.Get(t => t.Id == validId);
+                        members += $"{member.Firstname} {member.Lastname} ->";
+                    }
+                    else
+                    {
+                        members += "";
+                    }
+                }
+                lst.Add(new
+                {
+                    p.Id,
+                    p.Project.Name,
+                    p.Title,
+                    p.TaskDescription,
+                    p.Priority,
+                    Status = p.IsActive,
+                    StartDate = p.FromDate,
+                    EndDate = p.ToDate,
+                    p.IsCompleted,
+                    AssignedTo = members,
+                    p.DateCreated
+                });
+                members = "";
+            }
+            return Ok(lst);
         }
 
         //create team members
@@ -173,7 +209,7 @@ namespace TaskManagement.WebAPI.Controllers
             int teamLeadId = 0; //should come from the current logged in user
             int.TryParse(User.Identity.Name, out teamLeadId);
             await _teamMemberRepo.AddAsync(new TeamMember(dto.CountryId, teamLeadId, dto.Email, dto.FirstName, dto.LastName, dto.Password));
-            await _projectTaskRepo.UnitOfWork.SaveAsync();
+            await _teamMemberRepo.UnitOfWork.SaveAsync();
             return Ok($"Team member created successfully");
         }
         //view team members
@@ -181,6 +217,7 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> ViewTeamMembers()
         {
             int teamLeadId = 0; //should come from the current logged in user
+            int.TryParse(User.Identity.Name, out teamLeadId);
             var teamMembers = await _teamMemberRepo.GetAll(t => t.TeamLeadId == teamLeadId);
             if (teamMembers == null) return Problem(detail: "No user found", statusCode: (int)HttpStatusCode.InternalServerError);
             return Ok(teamMembers);
@@ -221,6 +258,29 @@ namespace TaskManagement.WebAPI.Controllers
 
         }
 
-        //define assign team member to project task action method
+        //assign team members to project task
+        [HttpPut("{ProjectTaskId:int}"), Authorize(Policy = "TeamLeadOnly")]
+        public async Task<IActionResult> AssignTeamMembersToTask(int ProjectTaskId, [FromBody] int teamMemberId)
+        {
+            int teamLeadId;
+            int.TryParse(User.Identity.Name, out teamLeadId);
+            var projectTask = await _projectTaskRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == ProjectTaskId);
+            //check if the team member was created by the team lead
+            var teamMember = await _teamMemberRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == teamMemberId);
+            if (teamMember == null) return Problem(detail: "Team member does not exists. You can create this user as a team member and add to the project", statusCode: (int)HttpStatusCode.InternalServerError);
+            //check if team member is already assigned to project
+            if (projectTask.AssignedTo.Split("_").Any(id => id == teamMemberId.ToString()))
+            {
+                //team member already assigned to project
+                return Ok($"Team member ({teamMember.Firstname}) already assigned to project");
+            }
+            projectTask.AssignTeamMember(teamMemberId); //domain entity behavior
+
+            //save changes to database by caling the UnitOfWork
+            await _projectTaskRepo.UnitOfWork.SaveAsync();
+            return Ok($"Team member ({teamMember.Firstname}) is now assigned to the project ({projectTask.Title})");
+
+
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace TaskManagement.WebAPI.Filters
         
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            Logger.LogIt(new Domain.Entities.Log(exception.StackTrace, exception.Message));
+            Logger.LogIt(new LogData(exception.StackTrace, exception.Message));
             await httpContext.Response.WriteAsJsonAsync(new
             {
                 StatusCode = (int)HttpStatusCode.InternalServerError,

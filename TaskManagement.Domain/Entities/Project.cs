@@ -32,7 +32,7 @@ namespace TaskManagement.Domain.Entities
         //behavior to assign team member to project
         public void AssignTeamMember(int teamMemberId)
         {
-            AssignedTeamMemberIds += $"_{teamMemberId}"; //ids should be seperated with underscore
+            AssignedTeamMemberIds += $"{teamMemberId}_"; //ids should be seperated with underscore
         }
     }
 }

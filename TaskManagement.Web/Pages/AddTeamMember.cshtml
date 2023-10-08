@@ -49,29 +49,30 @@
                                     <form class="user" method="post">
                                         @Html.AntiForgeryToken()
                                         <div class="form-group row">
-                                            <select name="ProjectTaskDTO.ProjectId" class="form-control select">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                            <select name="CreateTeamMemberDTO.CountryId" class="form-control select">
 
-                                                @foreach (var countries in (Countries[])ViewData["projects"])
+                                                @foreach (var countries in (Countries[])ViewData["countries"])
                                                 {
                                                     <option value="@countries.id">@countries.name</option>
 
                                                 }
 
-
                                             </select>
-                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                            </div>
+                                            <div class="col-sm-6">
                                                 <input type="text" class="form-control form-control-user"
                                                        placeholder="Email address" name="CreateTeamMemberDTO.Email">
                                                 <span asp-validation-for="CreateTeamMemberDTO.Email" class="text-white badge badge-danger"></span>
 
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-6 mt-3">
                                                 <input type="text" class="form-control form-control-user" id="exampleLastName"
                                                        placeholder="Firstname" name="CreateTeamMemberDTO.Firstname">
                                                 <span asp-validation-for="CreateTeamMemberDTO.FirstName" class="text-white badge badge-danger"></span>
                                             </div>
 
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-6 mt-3">
                                                 <input type="text" class="form-control form-control-user" id="exampleLastName"
                                                        placeholder="Lastname" name="CreateTeamMemberDTO.Lastname">
                                                 <span asp-validation-for="CreateTeamMemberDTO.LastName" class="text-white badge badge-danger"></span>

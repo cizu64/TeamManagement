@@ -30,6 +30,7 @@ namespace TaskManagement.Domain.Entities
         public string Role { get; private set; } = nameof(TeamMember);
 
         public TeamLead TeamLead { get; private set; }
+        public Country Country { get; private set; }
 
         //navigational property
         private readonly List<Todo> todo = new();

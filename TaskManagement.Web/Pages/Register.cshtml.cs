@@ -10,19 +10,24 @@ namespace TaskManagement.Web.Pages
     public class RegisterModel : PageModel
     {
         private readonly TeamLead teamLead;
-
-        public RegisterModel(TeamLead teamLead)
+        private readonly Country country;
+        public RegisterModel(TeamLead teamLead, Country country)
         {
             this.teamLead = teamLead;
+            this.country = country;
         }
         public async Task<IActionResult> OnGet()
         {
+            var countries = await country.Countries();
+            ViewData["countries"] = countries.detail as VM.Countries[];
             return Page();
         }
         [BindProperty]
         public RegisterDTO RegisterDTO { get; set; }
         public async Task<IActionResult> OnPost()
         {
+            var countries = await country.Countries();
+            ViewData["countries"] = countries.detail as VM.Countries[];
             if (!ModelState.IsValid)
             {
                 return Page();

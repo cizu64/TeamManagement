@@ -1,4 +1,5 @@
 ﻿@page
+@using static TaskManagement.Web.VM.TeamMemberVM;
 @model CreateProjectModel
 @{
     ViewData["Title"] = "Create Project";
@@ -66,7 +67,7 @@
 
                                                     @foreach (var tm in (TeamMembers[])ViewData["tm"])
                                                     {
-                                                        <option value="@tm.Id">@tm.Firstname +"-"+ tm.Lastname</option>
+                                                        <option value="@tm.Id">@tm.Firstname @tm.Lastname (@tm.Email)</option>
                                                     }
                                                 </select>
                                                 <span asp-validation-for="ProjectDTO.assignedTeamMemberIds" class="text-white badge badge-danger"></span>

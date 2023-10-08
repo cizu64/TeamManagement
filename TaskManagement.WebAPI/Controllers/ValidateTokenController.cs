@@ -19,8 +19,8 @@ namespace TaskManagement.WebAPI.Controllers
             var validationResult = await auth.ValidateToken(token);
             if(validationResult.Item1 == null) { return BadRequest(new { Role = "", Isvalid = false }); }
             var role = validationResult.Item1.FindFirst(x => x.Type == ClaimTypes.Role);
-            //var usid = validationResult.Item1.FindFirst(x => x.Type == ClaimTypes.Name);
-            return Ok(new { Role = role.Value, Isvalid = validationResult.Item2 });
+            var givenName = validationResult.Item1.FindFirst(x => x.Type == ClaimTypes.GivenName);
+            return Ok(new { Role = role.Value, Isvalid = validationResult.Item2, Name=givenName.Value });
         }
     }
 }

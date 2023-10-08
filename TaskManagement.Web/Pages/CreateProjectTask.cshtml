@@ -4,6 +4,7 @@
     ViewData["Title"] = "Create Project Task";
 }
 @using TaskManagement.Web.VM;
+@using static TaskManagement.Web.VM.TeamMemberVM;
 
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -108,7 +109,7 @@
 
                                                     @foreach (var tm in (TeamMembers[])ViewData["tm"])
                                                     {
-                                                        <option value="@tm.Id">@tm.Firstname +"-"+ tm.Lastname</option>
+                                                        <option value="@tm.Id">@tm.Firstname @tm.Lastname (@tm.Email)</option>
                                                     }
                                                 </select>
                                                 <span asp-validation-for="ProjectTaskDTO.AssignedTeamMemberIds" class="text-white badge badge-danger"></span>

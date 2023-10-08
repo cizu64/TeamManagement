@@ -5,6 +5,8 @@ using System.Text.Json;
 using TaskManagement.Web.VM;
 using TaskManagement.Web.Common;
 using TaskManagement.Web.Extensions;
+using static TaskManagement.Web.VM.TeamMemberVM;
+
 namespace TaskManagement.Web.Services
 {
     public class TeamLead
@@ -249,7 +251,7 @@ namespace TaskManagement.Web.Services
                 { "Authorization", $"Bearer {token}" }
             };
 
-            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewProjectTasks", "TeamLead", null, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            var request = await _client.SendRequestAsync(HttpMethod.Get, $"/ViewTeamMembers", "TeamLead", null, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
             if (request.IsSuccessStatusCode)
             {
                 var members = await request.Content.ReadFromJsonAsync<TeamMembers[]>();
@@ -276,7 +278,32 @@ namespace TaskManagement.Web.Services
                 { "Authorization", $"Bearer {token}" }
             };
 
-            var request = await _client.SendRequestAsync(HttpMethod.Put, $"/AssignTeamMembersToProject/{projectId}", "TeamLead", data, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            var request = await _client.SendRequestAsync(HttpMethod.Put, $"/AssignTeamMembersToProject/{projectId}", "TeamLead", data.teamMemberId, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
+            if (request.IsSuccessStatusCode)
+            {
+                var message = await request.Content.ReadAsStringAsync();
+                return new APIResult
+                {
+                    detail = message,
+                    statusCode = (int)request.StatusCode
+                };
+            }
+            var errorDetails = await request.Content.ReadAsStringAsync();
+            var result = errorDetails == "" ? new APIResult() : JsonSerializer.Deserialize<APIResult>(errorDetails);
+            return result;
+        }
+        public async Task<APIResult> AssignProjectTask(string token, int projectTaskId, int teamMemberId)
+        {
+            var data = new
+            {
+                teamMemberId
+            };
+            var headers = new Dictionary<string, string>
+            {
+                { "Authorization", $"Bearer {token}" }
+            };
+
+            var request = await _client.SendRequestAsync(HttpMethod.Put, $"/AssignTeamMembersToTask/{projectTaskId}", "TeamLead", data.teamMemberId, headers); //the base url is null because we are using a named instance that defines the base url in the program.cs class
             if (request.IsSuccessStatusCode)
             {
                 var message = await request.Content.ReadAsStringAsync();

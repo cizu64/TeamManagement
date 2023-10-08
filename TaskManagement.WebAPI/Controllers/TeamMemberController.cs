@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Domain.SeedWork;
 using TaskManagement.WebAPI.DTO;
+using TaskManagement.WebAPI.Security;
 
 namespace TaskManagement.WebAPI.Controllers
 {
@@ -14,76 +17,89 @@ namespace TaskManagement.WebAPI.Controllers
         private readonly IGenericRepository<ProjectTask> _projectTaskRepo;
         private readonly IGenericRepository<TeamMember> _teamMemberRepo;
         private readonly IGenericRepository<Todo> _todoRepo;
+        private readonly JwtAuth auth;
 
-        public TeamMemberController(IGenericRepository<TeamLead> teamLeadRepo, IGenericRepository<Project> projectRepo, IGenericRepository<ProjectTask> projectTaskRepo, IGenericRepository<TeamMember> teamMemberRepo, IGenericRepository<Todo> todoRepo)
+        public TeamMemberController(IGenericRepository<TeamLead> teamLeadRepo, IGenericRepository<Project> projectRepo, IGenericRepository<ProjectTask> projectTaskRepo, IGenericRepository<TeamMember> teamMemberRepo, IGenericRepository<Todo> todoRepo, JwtAuth auth)
         {
             _teamLeadRepo = teamLeadRepo;
             _projectRepo = projectRepo;
             _projectTaskRepo = projectTaskRepo;
             _teamMemberRepo = teamMemberRepo;
             _todoRepo = todoRepo;
+            this.auth = auth;
         }
-        [HttpGet]
+        [HttpGet, Authorize(Policy = "TeamMemberOnly")]
         public async Task<IActionResult> ViewProjects()
         {
-            int teamMemberId = 0; //current loggedin team member id
-            var tm = await _teamMemberRepo.GetAll(t => t.Id == teamMemberId, "TeamLead");
-            ArgumentNullException.ThrowIfNull(tm);
-            var projects = tm.Select(t => t.TeamLead.Projects);
-            return Ok(projects);
+            int teamMemberId; //current loggedin team member id
+            int.TryParse(User.Identity.Name, out teamMemberId);
+            var tm = await _teamMemberRepo.GetByIdAsync(teamMemberId, "TeamLead", "TeamLead.Projects");
+            var projects = tm.TeamLead.Projects;
+            if (projects == null) return Problem(detail: "No projects", statusCode: (int)HttpStatusCode.InternalServerError);
+            List<object> lstProjects = new();
+            foreach (var p in projects)
+            {
+                string newAssignedTMIds = p.AssignedTeamMemberIds;
+                if (!p.AssignedTeamMemberIds.StartsWith("_"))
+                {
+                    newAssignedTMIds = $"_{p.AssignedTeamMemberIds}";
+                }
+                if (newAssignedTMIds.Contains($"_{teamMemberId}_"))
+                {
+                    lstProjects.Add(new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.Description,
+                        p.DateCreated,
+                        p.IsActive
+                    });
+                }
+            }
+
+            return Ok(lstProjects);
         }
-        [HttpGet("{projectId:int}")]
+        [HttpGet("{projectId:int}"), Authorize(Policy = "TeamMemberOnly")]
         public async Task<IActionResult> ViewProjectTask(int projectId)
         {
-            int teamMemberId = 0; //current loggedin team member id
-            var pTask = await _projectTaskRepo.GetAll(t => t.Id == projectId);
-            ArgumentNullException.ThrowIfNull(pTask);
-            var teamMemberIds = pTask.Select(t => t.AssignedTo.Split("_").Where(t => t == teamMemberId.ToString())); //check weather the user is assigned to any project task
-            if (teamMemberIds.Any()) //if the user is assigned to the project task, display the project task for the team member
+            int teamMemberId; //current loggedin team member id
+            int.TryParse(User.Identity.Name, out teamMemberId);
+            var tm = await _teamMemberRepo.GetByIdAsync(teamMemberId, "TeamLead", "TeamLead.Projects", "TeamLead.Projects.ProjectTasks");
+            var tasks = tm.TeamLead.Projects.Select(t => t.ProjectTasks).FirstOrDefault();
+            List<object> lstTasks = new();
+            foreach (var t in tasks)
             {
-                return Ok(pTask);
+                string newAssignedTMIds = t.AssignedTo;
+                if (!t.AssignedTo.StartsWith("_"))
+                {
+                    newAssignedTMIds = $"_{t.AssignedTo}";
+                }
+                if (newAssignedTMIds.Contains($"_{teamMemberId}_"))
+                {
+                    lstTasks.Add(new
+                    {
+                        t.Id,
+                        t.Project.Name,
+                        t.Title,
+                        t.TaskDescription,
+                        t.Priority,
+                        Status = t.IsActive,
+                        StartDate = t.FromDate,
+                        EndDate = t.ToDate,
+                        t.IsCompleted,
+                        t.DateCreated
+                    });
+                }
             }
-            return BadRequest("No project task assigned to you");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddTodo([FromBody] CreateTodoDTO dto)
-        {
-            int teamMemberId = 0;
-            await _todoRepo.AddAsync(new Todo(teamMemberId, dto.ProjectTaskId, dto.Title, dto.Description));
-            await _projectRepo.UnitOfWork.SaveAsync();
-            return Ok($"""Todo "({dto.Title})" created successfully"""); //using the new c# raw string literal 
-        }
-
-        //view todos
-        [HttpGet]
-        public async Task<IActionResult> ViewTodo()
-        {
-            int teamMemberId = 0; //should come from the current logged in user
-            var todo = await _todoRepo.Get(t => t.TeamMemberId == teamMemberId);
-            ArgumentNullException.ThrowIfNull(todo); //guard clauses
-            return Ok(todo);
-        }
-        //view todo
-        [HttpGet("{Id:int}")]
-        public async Task<IActionResult> ViewTodos(int Id)
-        {
-            int teamMemberId = 0; //should come from the current logged in user
-            var todo = await _todoRepo.Get(t => t.Id == Id && t.TeamMemberId == teamMemberId);
-            ArgumentNullException.ThrowIfNull(todo); //guard clauses
-            return Ok(todo);
+            return Ok(lstTasks);
         }
 
         //team member sign in
         [HttpPost]
         public async Task<IActionResult> SignIn([FromBody] SignInDTO dto)
         {
-            var teamMember = await _teamMemberRepo.Get(t => t.Email.ToLower() == dto.Email.ToLower() && t.Password == dto.Password);
-            ArgumentNullException.ThrowIfNull(teamMember);
-
-            //return jwt token  
-
-            return Ok("token goes here");
+            string token = await auth.AuthenticateTeamMember(dto.Email, dto.Password);
+            return Ok(token);
         }
     }
 }

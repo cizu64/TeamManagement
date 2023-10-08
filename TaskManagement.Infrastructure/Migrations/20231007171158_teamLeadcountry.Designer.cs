@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManagement.Infrastructure;
 
@@ -11,9 +12,11 @@ using TaskManagement.Infrastructure;
 namespace TaskManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(TaskManagementContext))]
-    partial class TaskManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20231007171158_teamLeadcountry")]
+    partial class teamLeadcountry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,8 +273,6 @@ namespace TaskManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryId");
-
                     b.HasIndex("TeamLeadId");
 
                     b.ToTable("TeamMember");
@@ -349,19 +350,11 @@ namespace TaskManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("TaskManagement.Domain.Entities.TeamMember", b =>
                 {
-                    b.HasOne("TaskManagement.Domain.Entities.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TaskManagement.Domain.Entities.TeamLead", "TeamLead")
                         .WithMany("TeamMembers")
                         .HasForeignKey("TeamLeadId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Country");
 
                     b.Navigation("TeamLead");
                 });

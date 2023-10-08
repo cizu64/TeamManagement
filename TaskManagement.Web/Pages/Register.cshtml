@@ -1,4 +1,5 @@
 ﻿@page
+@using TaskManagement.Web.VM;
 @model TaskManagement.Web.Pages.RegisterModel
 @{
     Layout = "_Account";
@@ -40,8 +41,19 @@
                                        id="exampleInputPassword" placeholder="Password" name="RegisterDTO.Password">
                                 <span asp-validation-for="RegisterDTO.Password" class="text-white badge badge-danger"></span>
                             </div>
-                           
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <select name="RegisterDTO.CountryId" class="form-control select">
+
+                                    @foreach (var countries in (Countries[])ViewData["countries"])
+                                    {
+                                        <option value="@countries.id">@countries.name</option>
+
+                                    }
+
+                                </select>
+                            </div>
                         </div>
+                       
                         <input type="submit" value="Register Account" class="btn btn-primary btn-user btn-block" />
 
                         <div class="mt-2">
