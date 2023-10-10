@@ -65,13 +65,14 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin();
     });
 });
+string key = Encoding.Utf8.GetBytes(builder.Configuration["JWT:KEY"].ToString());
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new()
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(new byte[128]),
+        IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateAudience = false,
         ValidateIssuer = false,
         ClockSkew = TimeSpan.Zero

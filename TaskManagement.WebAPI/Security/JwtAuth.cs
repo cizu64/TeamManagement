@@ -12,18 +12,20 @@ namespace TaskManagement.WebAPI.Security
     {
         private readonly IGenericRepository<TeamLead> _teamLeadRepo;
         private readonly IGenericRepository<TeamMember> _teamMemberRepo;
-
-        public JwtAuth(IGenericRepository<TeamLead> teamLeadRepo, IGenericRepository<TeamMember> teamMemberRepo)
+        private readonly IConfiguration _configuration;
+        public JwtAuth(IGenericRepository<TeamLead> teamLeadRepo, IGenericRepository<TeamMember> teamMemberRepo, IConfiguration configuration)
         {
             _teamLeadRepo = teamLeadRepo;
             _teamMemberRepo = teamMemberRepo;
+            _configuration = configuration;
         }
         public async Task<string> AuthenticateTeamLead(string email, string password)
         {
             var teamLead = await _teamLeadRepo.Get(t => t.Email.ToLower() == email.ToLower() && t.Password == password);
             if (teamLead == null)  return string.Empty;
             var tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = new byte[128];
+            //byte[] key = new byte[128];
+            string key = Encoding.Utf8.GetBytes(_configuration["JWT:KEY"].ToString());
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, teamLead.Id.ToString()),
@@ -46,7 +48,7 @@ namespace TaskManagement.WebAPI.Security
             var teamMember = await _teamMemberRepo.Get(t => t.Email.ToLower() == email.ToLower() && t.Password == password);
             if (teamMember == null) return string.Empty;
             var tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = new byte[128];
+            string key = Encoding.Utf8.GetBytes(_configuration["JWT:KEY"].ToString());
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, teamMember.Id.ToString()),
@@ -68,6 +70,8 @@ namespace TaskManagement.WebAPI.Security
         {
             try
             {
+                string key = Encoding.Utf8.GetBytes(_configuration["JWT:KEY"].ToString());
+
                 var validationResult = await new JwtSecurityTokenHandler().ValidateTokenAsync(token, new TokenValidationParameters
                 {
                     ClockSkew = TimeSpan.Zero,
@@ -75,7 +79,7 @@ namespace TaskManagement.WebAPI.Security
                     ValidateIssuerSigningKey = true,
                     ValidateAudience=false,
                     ValidateIssuer=false,
-                    IssuerSigningKey = new SymmetricSecurityKey(new byte[128])
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
                 });
                 return new(validationResult.ClaimsIdentity, validationResult.SecurityToken != null);
             }
