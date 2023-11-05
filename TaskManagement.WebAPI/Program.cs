@@ -42,7 +42,7 @@ builder.Services.AddRateLimiter(options =>
         options.PermitLimit = 2;
         options.Window = TimeSpan.FromSeconds(30);
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 2;
+        options.QueueLimit = 2; //remove this if you want the RejectionStatusCode and the OnRejected to be invoked. 
 
     });
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
