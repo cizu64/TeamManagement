@@ -53,6 +53,7 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
 builder.Services.AddDataProtection();
 
 const string CorsPolicy = "CORS";
@@ -160,10 +161,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseCors(CorsPolicy);
+
+app.UseResponseCaching(); //UseCors must be called before UseResponseCaching
+
 app.MapControllers();
 app.MapHealthChecks("/healths");
 app.Run();
