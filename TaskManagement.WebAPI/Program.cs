@@ -42,7 +42,7 @@ builder.Services.AddRateLimiter(options =>
         options.PermitLimit = 2;
         options.Window = TimeSpan.FromSeconds(30);
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 2;
+        options.QueueLimit = 2; //remove this if you want the RejectionStatusCode and the OnRejected to be invoked. 
 
     });
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -53,6 +53,7 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
 builder.Services.AddDataProtection();
 
 const string CorsPolicy = "CORS";
@@ -167,10 +168,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseCors(CorsPolicy);
+
+app.UseResponseCaching(); //UseCors must be called before UseResponseCaching
+
 app.MapControllers();
 app.MapHealthChecks("/healths");
 app.Run();
