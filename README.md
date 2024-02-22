@@ -7,6 +7,11 @@ To run the project successfully, make sure you create the database and apply mig
 dotnet ef database update --project TaskManagement.Infrastructure  --startup-project TaskManagement.WebAPI
 ```
 
+Or delete the files in the migrations folder and run the add migration command before the update command above
+```
+ dotnet ef migrations add first -p TaskManagement.Infrastructure --startup-project TaskManagement.WebAPI
+```
+
 If you are using a MAC, you can install Postgres on your Mac and EF packages for Postgres and change the connection string and apply migrations as well.
 ```
   builder.Services.AddDbContext<TaskManagementContext>(options =>
