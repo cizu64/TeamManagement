@@ -12,13 +12,3 @@ Or delete the files in the migrations folder and run the add migration command b
  dotnet ef migrations add first -p TaskManagement.Infrastructure --startup-project TaskManagement.WebAPI
 ```
 
-If you are using a MAC, you can install Postgres on your Mac and EF packages for Postgres and change the connection string and apply migrations as well.
-```
-  builder.Services.AddDbContext<TaskManagementContext>(options =>
-  {
-    options.UseNpgsql(builder.Configuration["ConnectionString"], opt =>
-    {
-        opt.EnableRetryOnFailure(15, TimeSpan.FromSeconds(30), errorCodesToAdd: null);
-    });
-  });
-```
