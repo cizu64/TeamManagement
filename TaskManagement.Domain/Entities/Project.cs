@@ -20,7 +20,7 @@ namespace TaskManagement.Domain.Entities
         public string Description { get; private set; }
         public int TeamLeadId { get; private set; }
         public bool IsActive { get; private set; } = true;
-        public DateTime DateCreated { get; private set; } = DateTime.Now;
+        public DateTime DateCreated { get; private set; } = DateTime.UtcNow;
         public string AssignedTeamMemberIds { get; private set; } 
 
         public TeamLead TeamLead { get; private set; }

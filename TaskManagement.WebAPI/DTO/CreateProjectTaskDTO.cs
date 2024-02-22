@@ -10,17 +10,17 @@ namespace TaskManagement.WebAPI.DTO
     }
     public record CreateProjectTaskDTO
     {
-        [Required]
+        [Required(ErrorMessage ="From Date is Required")]
         public DateTime FromDate { get;  set; }
         public string[]? AssignedTo { get;  set; }
-        [Required]
+        [Required(ErrorMessage ="To Date is required")]
         public required DateTime ToDate { get;  set; }
         public string Priority { get; set; } = "HIGH";
-        [Required]
+        [Required(ErrorMessage ="Project id is required")]
         public  int ProjectId { get;  set; }
-        [Required]
+        [Required(ErrorMessage ="Title is required")]
         public string Title { get; set; }
-        [Required]
+        [Required(ErrorMessage ="Task description is required")]
         public string TaskDescription { get; set; }
     }
 }

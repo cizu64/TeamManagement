@@ -33,7 +33,7 @@ namespace TaskManagement.WebAPI.Controllers
         {
             await _teamLeadRepo.AddAsync(new TeamLead(dto.CountryId,dto.Email, dto.Firstname, dto.Lastname, dto.Password));
             var checkEmailExists = await _teamLeadRepo.AnyAsync(e => e.Email == dto.Email);
-            if(checkEmailExists) return Problem(detail: "Email already exists", statusCode: (int)HttpStatusCode.InternalServerError);
+            if(checkEmailExists) return Problem(detail: "Email already exists", statusCode: (int)HttpStatusCode.BadRequest);
             await _teamLeadRepo.UnitOfWork.SaveAsync();
             //return created object 
             return Ok("Account created");
@@ -43,7 +43,7 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> SignIn([FromBody] SignInDTO dto)
         {
             string token = await auth.AuthenticateTeamLead(dto.Email, dto.Password);
-            if (token == string.Empty) return Problem(detail: "Invalid email or password", statusCode: (int)HttpStatusCode.InternalServerError);
+            if (token == string.Empty) return Problem(detail: "Invalid email or password", statusCode: (int)HttpStatusCode.BadRequest);
             //return jwt token  
             return Ok(token);
         }
@@ -72,7 +72,7 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> ViewProject(int Id)
         {
             int teamLeadId = 0;
-            if(!int.TryParse(User.Identity.Name,out teamLeadId)) return Problem(detail: "Anthorization required", statusCode: (int)HttpStatusCode.InternalServerError);
+            if(!int.TryParse(User.Identity.Name,out teamLeadId)) return Problem(detail: "Anthorization required", statusCode: (int)HttpStatusCode.BadRequest);
             var project = await _projectRepo.Get(p => p.Id == Id && p.TeamLeadId == teamLeadId);
             var teamMembers = project.AssignedTeamMemberIds.Split("_");
             string Members = "";
@@ -219,7 +219,7 @@ namespace TaskManagement.WebAPI.Controllers
             int teamLeadId = 0; //should come from the current logged in user
             int.TryParse(User.Identity.Name, out teamLeadId);
             var teamMembers = await _teamMemberRepo.GetAll(t => t.TeamLeadId == teamLeadId);
-            if (teamMembers == null) return Problem(detail: "No user found", statusCode: (int)HttpStatusCode.InternalServerError);
+            if (teamMembers == null) return Problem(detail: "No user found", statusCode: (int)HttpStatusCode.BadRequest);
             return Ok(teamMembers);
         }
 
@@ -242,7 +242,7 @@ namespace TaskManagement.WebAPI.Controllers
             var project = await _projectRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == ProjectId);
             //check if the team member was created by the team lead
             var teamMember = await _teamMemberRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == teamMemberId);
-            if (teamMember == null) return Problem(detail: "Team member does not exists. You can create this user as a team member and add to the project", statusCode: (int)HttpStatusCode.InternalServerError);
+            if (teamMember == null) return Problem(detail: "Team member does not exists. You can create this user as a team member and add to the project", statusCode: (int)HttpStatusCode.BadRequest);
             //check if team member is already assigned to project
             if (project.AssignedTeamMemberIds.Split("_").Any(id => id == teamMemberId.ToString()))
             {
@@ -267,7 +267,7 @@ namespace TaskManagement.WebAPI.Controllers
             var projectTask = await _projectTaskRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == ProjectTaskId);
             //check if the team member was created by the team lead
             var teamMember = await _teamMemberRepo.Get(t => t.TeamLeadId == teamLeadId && t.Id == teamMemberId);
-            if (teamMember == null) return Problem(detail: "Team member does not exists. You can create this user as a team member and add to the project", statusCode: (int)HttpStatusCode.InternalServerError);
+            if (teamMember == null) return Problem(detail: "Team member does not exists. You can create this user as a team member and add to the project", statusCode: (int)HttpStatusCode.BadRequest);
             //check if team member is already assigned to project
             if (projectTask.AssignedTo.Split("_").Any(id => id == teamMemberId.ToString()))
             {

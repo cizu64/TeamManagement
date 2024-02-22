@@ -22,6 +22,6 @@ namespace TaskManagement.Domain.Entities
         public string Role { get; private set; }
         public int Title { get; private set; }
         public int Description { get; private set; }      
-        public DateTime DateCreated { get; private set; } = DateTime.Now;
+        public DateTime DateCreated { get; private set; } = DateTime.UtcNow;
     }
 }

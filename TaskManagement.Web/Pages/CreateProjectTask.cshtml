@@ -105,14 +105,14 @@
 
                                             <div class="col-sm-6 mt-3">
 
-                                                <select name="ProjectTaskDTO.AssignedTeamMemberIds" class="form-control select" multiple>
+                                                <select name="ProjectTaskDTO.assignedTo" class="form-control select" multiple>
 
                                                     @foreach (var tm in (TeamMembers[])ViewData["tm"])
                                                     {
                                                         <option value="@tm.Id">@tm.Firstname @tm.Lastname (@tm.Email)</option>
                                                     }
                                                 </select>
-                                                <span asp-validation-for="ProjectTaskDTO.AssignedTeamMemberIds" class="text-white badge badge-danger"></span>
+                                                <span asp-validation-for="ProjectTaskDTO.AssignedTo" class="text-white badge badge-danger"></span>
                                             </div>
 
                                         </div>

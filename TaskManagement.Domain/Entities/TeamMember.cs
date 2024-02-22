@@ -26,7 +26,7 @@ namespace TaskManagement.Domain.Entities
         public string Lastname { get; private set; }
         public string Password { get; private set; }
         public bool IsActive { get; private set; } = true;
-        public DateTime DateCreated { get; private set; } = DateTime.Now;
+        public DateTime DateCreated { get; private set; } = DateTime.UtcNow;
         public string Role { get; private set; } = nameof(TeamMember);
 
         public TeamLead TeamLead { get; private set; }

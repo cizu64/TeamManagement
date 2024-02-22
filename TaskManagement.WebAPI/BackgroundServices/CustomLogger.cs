@@ -15,10 +15,10 @@ namespace TaskManagement.WebAPI.BackgroundServices
         public CustomLogger(IConfiguration configuration, ILogger<CustomLogger> logger)
         {
             _logger = logger;
-            timer = new PeriodicTimer(TimeSpan.FromSeconds(20));
+            timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
             _configuration = configuration;
             var optionsBuilder = new DbContextOptionsBuilder<TaskManagementContext>();
-            optionsBuilder.UseSqlServer(configuration["ConnectionString"]);
+            optionsBuilder.UseNpgsql(configuration["ConnectionString"]);
             context = new TaskManagementContext(optionsBuilder.Options);
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

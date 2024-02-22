@@ -127,14 +127,21 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddDbContext<TaskManagementContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration["ConnectionString"], options =>
-    {
-        options.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
-    });
-});
+// builder.Services.AddDbContext<TaskManagementContext>(options =>
+// {
+//     options.UseSqlServer(builder.Configuration["ConnectionString"], options =>
+//     {
+//         options.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+//     });
+// });
 
+  builder.Services.AddDbContext<TaskManagementContext>(options =>
+  {
+    options.UseNpgsql(builder.Configuration["ConnectionString"], opt =>
+    {
+        opt.EnableRetryOnFailure(15, TimeSpan.FromSeconds(30), errorCodesToAdd: null);
+    });
+  });
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<JwtAuth>();
 builder.Services.AddScoped<DataProtector>();

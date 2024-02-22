@@ -32,7 +32,7 @@ namespace TaskManagement.Domain.Entities
         public DateTime ToDate { get; private set; }
         public bool IsActive { get; private set; } = true;
         public bool IsCompleted { get; private set; } = false;
-        public DateTime DateCreated { get; private set; } = DateTime.Now;
+        public DateTime DateCreated { get; private set; } = DateTime.UtcNow;
 
         //child entity
         public Project Project { get; private set; }

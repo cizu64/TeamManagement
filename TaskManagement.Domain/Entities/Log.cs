@@ -18,6 +18,6 @@ namespace TaskManagement.Domain.Entities
 
         public string Message { get; private set; }
         public string? ShortMessage { get; private set; }
-        public DateTime DateLogged { get; private set; } = DateTime.Now;
+        public DateTime DateLogged { get; private set; } = DateTime.UtcNow;
     }
 }

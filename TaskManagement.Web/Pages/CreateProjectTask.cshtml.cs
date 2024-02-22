@@ -36,6 +36,7 @@ namespace TaskManagement.Web.Pages
         public ProjectTaskDTO ProjectTaskDTO { get; set; }
         public async Task<IActionResult> OnPost()
         {
+            
             string token = Request.Cookies["token"].ToString();
             APIResult projects = await teamLead.ViewProjects(token);
             ViewData["projects"] = projects.detail as IReadOnlyList<AllProject>;
@@ -47,10 +48,10 @@ namespace TaskManagement.Web.Pages
             {
                 return Page();
             }
-            var fromDate = ProjectTaskDTO.FromDate.ToString("yyyy-M-dd");
-            var toDate = ProjectTaskDTO.ToDate.ToString("yyyy-M-dd");
+            var fromDate = ProjectTaskDTO.FromDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+            var toDate = ProjectTaskDTO.ToDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
 
-            APIResult addTask = await teamLead.AddTask(token, ProjectTaskDTO.ProjectId, ProjectTaskDTO.AssignedTeamMemberIds, ProjectTaskDTO.Title, ProjectTaskDTO.TaskDescription, ProjectTaskDTO.Priority, fromDate, toDate);
+            APIResult addTask = await teamLead.AddTask(token, ProjectTaskDTO.ProjectId, ProjectTaskDTO.AssignedTo, ProjectTaskDTO.Title, ProjectTaskDTO.TaskDescription, ProjectTaskDTO.Priority, fromDate, toDate);
 
             if (addTask.statusCode != (int)HttpStatusCode.OK)
             {
@@ -66,7 +67,7 @@ namespace TaskManagement.Web.Pages
     public class ProjectTaskDTO
     {
         public string Title { get; set; }
-        public string[]? AssignedTeamMemberIds { get; set; }
+        public string[]? AssignedTo { get; set; }
         [Required]
         public DateTime FromDate { get; set; }
         [Required]
@@ -77,5 +78,7 @@ namespace TaskManagement.Web.Pages
         public int ProjectId { get; set; }
         [Required]
         public string TaskDescription { get; set; }
+
+        
     }
 }

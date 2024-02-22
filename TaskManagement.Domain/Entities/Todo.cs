@@ -24,6 +24,6 @@ namespace TaskManagement.Domain.Entities
         public string Title { get; private set; }
         public string Description { get; private set; }
         public bool IsCompleted { get; private set; } = false;
-        public DateTime DateCreated { get; private set; } = DateTime.Now;
+        public DateTime DateCreated { get; private set; } = DateTime.UtcNow;
     }
 }
