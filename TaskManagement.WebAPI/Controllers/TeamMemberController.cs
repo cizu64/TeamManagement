@@ -35,7 +35,7 @@ namespace TaskManagement.WebAPI.Controllers
             int.TryParse(User.Identity.Name, out teamMemberId);
             var tm = await _teamMemberRepo.GetByIdAsync(teamMemberId, "TeamLead", "TeamLead.Projects");
             var projects = tm.TeamLead.Projects;
-            if (projects == null) return Problem(detail: "No projects", statusCode: (int)HttpStatusCode.InternalServerError);
+            if (projects == null) return Problem(detail: "No projects", statusCode: (int)HttpStatusCode.BadRequest);
             List<object> lstProjects = new();
             foreach (var p in projects)
             {
@@ -99,7 +99,7 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> SignIn([FromBody] SignInDTO dto)
         {
             string token = await auth.AuthenticateTeamMember(dto.Email, dto.Password);
-            if (token == string.Empty) return Problem(detail: "Invalid email or password", statusCode: (int)HttpStatusCode.InternalServerError);
+            if (token == string.Empty) return Problem(detail: "Invalid email or password", statusCode: (int)HttpStatusCode.BadRequest);
             return Ok(token);
         }
     }
