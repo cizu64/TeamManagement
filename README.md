@@ -20,4 +20,11 @@ If you are using a MAC, you can install Postgres on your Mac and EF packages for
   });
 ```
 
+To run the web api and razor pages projects, open the terminal and type this:
+
+```
+   Web API - dotnet run -p TaskManagement.WebAPI  -lp https
+   Website - dotnet run -p TaskManagement.WebA  -lp https
+```
+
 <h3>Note: The master branch uses Postgres sql. To work with Microsoft Sql Server, use the Dev branch</h3>
