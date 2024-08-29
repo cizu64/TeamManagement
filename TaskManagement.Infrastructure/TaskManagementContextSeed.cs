@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TaskManagement.Domain.SeedWork;
 
 namespace TaskManagement.Infrastructure
@@ -9,6 +10,7 @@ namespace TaskManagement.Infrastructure
         {
             try
             {
+                await context.Database.MigrateAsync(); //this will automatically migrate the database
                 if (!context.Country.Any())
                 {
                     context.Country.Add(new Domain.Entities.Country("USA"));
