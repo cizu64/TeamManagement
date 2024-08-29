@@ -1,7 +1,9 @@
 # TeamManagement
 The Team Management Project Application in ASP.NET Core 8
 
-To run the project successfully, make sure you create the database and apply migration to create the tables
+To run the project successfully, make sure you have postgres database installed and the migrations will be applied automatically.
+
+To apply migrations manually, run this
 
 ```
 dotnet ef database update --project TeamManagement.Infrastructure  --startup-project TeamManagement.WebAPI
